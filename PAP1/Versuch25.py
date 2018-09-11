@@ -41,9 +41,9 @@ d_a = [4e-3, 4e-3]
 phixy = [0.0, 0.0]
 d_phixy = [0.0, 0.0]
 for i in range(2):
-	d_t[i] = m.sqrt(d_t[i]**2 + (0.03 * t[i])**2)
-	d_a[i] = m.sqrt(d_a[i]**2 + (0.03 * a[i])**2)
-	d_b[i] = m.sqrt(d_b[i]**2 + (0.03 * b[i])**2)
+ d_t[i] = m.sqrt(d_t[i]**2 + (0.03 * t[i])**2)
+ d_a[i] = m.sqrt(d_a[i]**2 + (0.03 * a[i])**2)
+ d_b[i] = m.sqrt(d_b[i]**2 + (0.03 * b[i])**2)
 for i in range(2):
  phiyt[i] = f * t[i] * 360.0
  d_phiyt[i] = 360.0 * m.sqrt(f**2 * d_t[i]**2 + t[i]**2 * d_f**2)
