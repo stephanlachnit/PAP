@@ -47,7 +47,7 @@ for i in range(2):
  phiyt[i] = f * t[i] * 360.0
  d_phiyt[i] = 360.0 * m.sqrt(f**2 * d_t[i]**2 + t[i]**2 * d_f**2)
  phixy[i] = m.asin(b[i] / a[i]) * 180.0 / m.pi
- d_phixy[i] = 1.0 / (a[i]**2 * abs(m.cos(phixy[i]))) * m.sqrt(a[i]**2 * d_b[i]**2 + b[i]**2 * d_a[i]**2)
+ d_phixy[i] = 1.0 / (a[i]**2 * abs(m.cos(phixy[i]))) * m.sqrt(a[i]**2 * d_b[i]**2 + b[i]**2 * d_a[i]**2) * 180 / m.pi
 phixy[0] = 180.0 - phixy[0]
 
 #print()
