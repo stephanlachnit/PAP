@@ -14,7 +14,7 @@ M_CO2 = 44e-3
 c_CO2 = m.sqrt(k_CO2 * R * T0 / M_CO2)
 
 h0_xy = [3.5e-2, 3.5e-2, 3.5e-2, 3.5e-2, 3.5e-2, 3.5e-2, 3.5e-2, 3.4e-2]
-h0_xy = mean_value(h0_xy)
+h0_xy = ms.mean_value(h0_xy)
 h0_yt = 3.5e-2
 d_h0 = m.sqrt(2/7) * 0.1e-2
 c_xy = h0_xy * 10e3
