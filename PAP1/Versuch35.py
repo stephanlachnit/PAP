@@ -22,9 +22,8 @@ for i in range(len(Ui)):
   dI.append([])
   for j in range(len(Ui[i])):
     dUi[i][j] = m.sqrt(dUi[i][j]**2 + (0.0008 * Ui[i][j])**2)
-    I[i].append(91e-12 * m.sqrt(Ui[i][j] - Uug[i]))
-    dI[i].append(91e-12 / 2 * m.sqrt( (dUi[i][j]**2 + dUug[i]**2) / (Ui[i][j] - Uug[i])))
+    I[i].append(m.sqrt(Ui[i][j] - Uug[i]))
+    dI[i].append(1 / 2 * m.sqrt((dUi[i][j]**2 + dUug[i]**2) / (Ui[i][j] - Uug[i])))
 
 for i in range(len(Ui)):
-  ms.ple("Ui_" + str(i+1), Ui[i], dUi[i])
   ms.ple("I_" + str(i+1), I[i], dI[i])
