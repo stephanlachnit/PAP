@@ -48,20 +48,25 @@ def reg_grad_err(x, y, dy):
   eta = s0 * s3 - s1 * s1
   return m.sqrt(s0 / eta)
 
+def sigerr(err):
+  if ("{0:.1e}".format(err)[0] == "1" or "{0:.1e}".format(err)[0] == "2"):
+    return float("{0:.1e}".format(err))
+  else:
+    return float("{0:.0e}".format(err))
+
+def sigval(val, err):
+  return round(val, 1 - int(m.floor(m.log10(sigerr(err)))))
+
 def pv(name, val):
   print()
   print(name + " = " + str(val))
 
 def pve(name, val, err):
   print()
-  sigerr = float("{0:.1e}".format(err))
-  sigval = round(val, 1 - int(m.floor(m.log10(sigerr))))
-  print(name + " = " + str(sigval) + " ± " + str(sigerr))
+  print(name + " = " + str(sigval(val, err)) + " ± " + str(sigerr(err)))
 
 def ple(name, val, err):
   print()
   print(name + ":")
   for i in range(len(val)):
-    sigerr = float("{0:.1e}".format(err[i]))
-    sigval = round(val[i], 1 - int(m.floor(m.log10(sigerr))))
-    print(str(sigval) + " ± " + str(sigerr))
+    print(str(sigval(val[i], err[i])) + " ± " + str(sigerr(err[i])))
