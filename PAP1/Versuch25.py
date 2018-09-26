@@ -28,6 +28,8 @@ for i in range(5):
 thalb = 3.0e-6
 d_thalb = m.sqrt((0.17e-6)**2 + (0.03 * thalb)**2)
 
+f = 10e3
+d_f = 0.03 * f
 t = [35.5e-6, 8.9e-6]
 d_t = [0.5e-6, 0.5e-6]
 phiyt = [0.0, 0.0]
@@ -39,10 +41,14 @@ d_a = [4e-3, 4e-3]
 phixy = [0.0, 0.0]
 d_phixy = [0.0, 0.0]
 for i in range(2):
- phiyt[i] = 10e3 * t[i] *360
- d_phiyt[i] = 10e3 * d_t[i] *360
- phixy[i] = m.asin(b[i] / a[i]) *360 -180 #warum?
- d_phixy[i] = m.cos(b[i] / a[i]) / a[i] * m.sqrt(d_b[i]**2 + (b[i] * d_a[i] / a[i])**2) #falsch
+ d_t[i] = m.sqrt(d_t[i]**2 + (0.03 * t[i])**2)
+ d_a[i] = m.sqrt(d_a[i]**2 + (0.03 * a[i])**2)
+ d_b[i] = m.sqrt(d_b[i]**2 + (0.03 * b[i])**2)
+ phiyt[i] = f * t[i] * 360.0
+ d_phiyt[i] = 360.0 * m.sqrt(f**2 * d_t[i]**2 + t[i]**2 * d_f**2)
+ phixy[i] = m.asin(b[i] / a[i]) * 180.0 / m.pi
+ d_phixy[i] = 1.0 / (a[i]**2 * abs(m.cos(phixy[i]))) * m.sqrt(a[i]**2 * d_b[i]**2 + b[i]**2 * d_a[i]**2) * 180 / m.pi
+ phixy[0] = 180.0 - phixy[0]
 
 #print()
 #print(T[4]*1e6)
