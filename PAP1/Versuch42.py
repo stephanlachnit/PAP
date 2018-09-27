@@ -24,9 +24,13 @@ dW = m.sqrt((Tw - Tm)**2 * ((cw * dmw)**2 + (mw * dcw)**2) + (mw * cw)**2 * (dTw
 W = 92.0
 dW = 17.0
 
+ms.pve("mw", mw, dmw)
 ms.pve("Wasserwert", W, dW)
 
 # T=100°C
+R = 8.3144598
+Mp = [207.2e-3, 26.9815385e-3, 12.011e-3]
+
 p = 1024.6
 dp = 2.0
 mp = [501.773e-3, 131.08e-3, 125.05e-3]
@@ -37,10 +41,14 @@ Tw = [27.4, 24.7, 23.4]
 dTw = [0.2, 0.2, 0.2]
 Tp = [100 + 0.0276 * (p - p0) for i in range(len(mp))]
 dTp = [0.0276 * dp for i in range(len(mp))]
+
 Tm = [29.7, 29.5, 27.4]
 dTm = [0.1, 0.1, 0.1]
+
 cp = []
 dcp = []
+cpMol = []
+dcpMol = []
 for i in range(len(mp)):
   mw[i] -= mk
   dmw[i] = m.sqrt(dmw[i]**2 + dmk**2)
@@ -49,12 +57,18 @@ for i in range(len(mp)):
       (Tm[i] - Tw[i])**2 * ((cw * dmw[i])**2 + (mw[i] * dcw)**2 + dW**2
     + (mw[i] * cw + W)**2 * ((dmp[i] / mp[i])**2 + (dTp[i] / (Tp[i] - Tm[i]))**2))
     + (mw[i] * cw + W)**2 * (dTw[i]**2 + ((Tp[i] - Tw[i]) / (Tp[i]- Tm[i]) * dTm[i])**2)))
+  cpMol.append(Mp[i] * cp[i])
+  dcpMol.append(Mp[i] * dcp[i])
 
 sigma = [129.0, 900.0, 709.0]
 for i in range(len(sigma)):
   sigma[i] = (sigma[i] - cp[i]) / dcp[i]
 
+Cdp = [3 * R / mp[i] for i in range(len(mp))]
+
 ms.ple("cp", cp, dcp)
-ms.pl("sigma", sigma)
+ms.ple("cpMol", cpMol, dcpMol)
+ms.pl("Cdp", Cdp)
+#ms.pl("sigma", sigma)
 
 # T=-196°C
