@@ -65,6 +65,12 @@ def pve(name, val, err):
   print()
   print(name + " = " + str(sigval(val, err)) + " ± " + str(sigerr(err)))
 
+def pl(name, val):
+  print()
+  print(name + ":")
+  for i in range(len(val)):
+    print(val[i])
+
 def ple(name, val, err):
   print()
   print(name + ":")
