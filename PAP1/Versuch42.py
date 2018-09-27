@@ -72,3 +72,27 @@ ms.pl("Cdp", Cdp)
 #ms.pl("sigma", sigma)
 
 # T=-196°C
+Tn = -195.8
+Qv = 199e3
+mn0 = [505.9e-3, 484.1e-3, 455.60e-3]
+dmn0 = [0.3e-3, 0.3e-3, 0.10e-3]
+mn1 = [484.70e-3, 455.80e-3, 435.93e-3]
+dmn1 = [0.05e-3, 0.05e-3, 0.05e-3]
+mn = [mn0[i] - mn1[i] for i in range(len(mn0))]
+dmn = [m.sqrt(dmn0[i]**2 + dmn1[i]**2) for i in range(len(mn0))]
+
+cp = []
+dcp = []
+cpMol = []
+dcpMol = []
+for i in range(len(mn)):
+  cp.append(Qv * mn[i] / (mp[i] * (Tl - Tn)))
+  cpMol.append(Mp[i] * cp[i])
+
+ms.ple("mn", mn, dmn)
+ms.ple("mp", mp, dmp)
+ms.pv("Tn", Tn)
+ms.pve("Tl", Tl, dTl)
+ms.pv("Qv", Qv)
+ms.pl("cp", cp)
+ms.pl("cpMol", cpMol)
