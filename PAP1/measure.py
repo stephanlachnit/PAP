@@ -135,11 +135,11 @@ def sigval(val, err):
 
 def pv(name, val):
   print()
-  print(name + " = " + str(val))
+  print(name + ": " + str(val))
 
 def pve(name, val, err):
   print()
-  print(name + " = " + str(sigval(val, err)) + " ± " + str(sigerr(err)))
+  print(name + ": " + str(sigval(val, err)) + " ± " + str(sigerr(err)))
 
 def pl(name, val):
   print()
@@ -175,6 +175,4 @@ def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
   plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()
-  print()
-  print("slope: " + str(sigval(g, dg)) + " ± " + str(sigerr(dg)))
-  print("y-intercept: " + str(sigval(b, db)) + " ± " + str(sigerr(db)))
+  return [g, dg, b, db]
