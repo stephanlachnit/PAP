@@ -49,8 +49,7 @@ for i in range(len(mp)):
   mw[i] -= mk
   dmw[i] = m.sqrt(dmw[i]**2 + dmk**2)
   cpH.append((mw[i] * cw + W) * (Tm[i] - Tw[i]) / (mp[i] * (Tp[i] - Tm[i])))
-  dcpH.append(1.0 / (mp[i] * (Tp[i] - Tm[i])) * m.sqrt(
-      (Tm[i] - Tw[i])**2 * ((cw * dmw[i])**2 + (mw[i] * dcw)**2 + dW**2
+  dcpH.append(1.0 / (mp[i] * (Tp[i] - Tm[i])) * m.sqrt((Tm[i] - Tw[i])**2 * ((cw * dmw[i])**2 + (mw[i] * dcw)**2 + dW**2
     + (mw[i] * cw + W)**2 * ((dmp[i] / mp[i])**2 + (dTp[i] / (Tp[i] - Tm[i]))**2))
     + (mw[i] * cw + W)**2 * (dTw[i]**2 + ((Tp[i] - Tw[i]) / (Tp[i]- Tm[i]) * dTm[i])**2)))
   cpMolH.append(Mp[i] * cpH[i])
@@ -89,9 +88,8 @@ cpMolN = []
 dcpMolN = []
 for i in range(len(mn)):
   cpN.append(Qv * mn[i] / (mp[i] * (Tl - Tn)))
-  dcpN.append(1.0 / (mp[i] * (Tl - Tn)) * m.sqrt(
-      (Qv * dmn[i])**2
-      + (Qv * mn[i])**2 * ((dmp[i] / mp[i])**2 + 1.0 / (Tl - Tn)**2 * dTl**2)))
+  dcpN.append(1.0 / (mp[i] * (Tl - Tn)) * m.sqrt((Qv * dmn[i])**2
+    + (Qv * mn[i])**2 * ((dmp[i] / mp[i])**2 + 1.0 / (Tl - Tn)**2 * dTl**2)))
   cpMolN.append(Mp[i] * cpN[i])
   dcpMolN.append(Mp[i] * dcpN[i])
 
