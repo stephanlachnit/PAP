@@ -23,10 +23,7 @@ def std_dev_e(x):
   return m.sqrt(qs / (len(x) - 1))
 
 def std_dev_m(x):
-  qs = 0
-  for i in range(len(x)):
-    qs += (x[i] - mean_value(x))**2
-  return m.sqrt(qs / ((len(x) - 1) * len(x)))
+  return std_dev_e(x) / sqrt(len(x))
 
 def reg_itc_y(x, y, dy):
   s0 = 0
