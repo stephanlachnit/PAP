@@ -170,9 +170,9 @@ def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
   plt.title(title)
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
-  plt.errorbar(xval, yval, yerr = yerr, xerr = xerr, fmt='o', capsize=2.0, color="#404040", ecolor="#404040")
-  plt.plot(x, y1, label="line of error", color="orange")
-  plt.plot(x, y0, label="line of fit", color="red")
+  plt.plot(x, y0, label="line of fit")
+  plt.plot(x, y1, label="line of error")
+  plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()
   return [g, dg, b, db]
