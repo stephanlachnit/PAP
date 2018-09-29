@@ -1,6 +1,14 @@
 import math as m
+import matplotlib.pyplot as plt
 
-p = 0.00001
+p = 0.00001 # percent change to stop iterations in linear regression
+n = 1000 # number of iteration for plotting functions
+
+def sqrt(x):
+  return m.sqrt(x)
+
+def pi():
+  return m.pi
 
 def mean_value(x):
   s = 0
@@ -115,7 +123,10 @@ def sigerr(err):
     return float("{0:.0e}".format(err))
 
 def sigval(val, err):
-  return round(val, 1 - int(m.floor(m.log10(sigerr(err)))))
+  if (sigerr(err) == 0):
+    return val
+  else:  
+    return round(val, 1 - int(m.floor(m.log10(sigerr(err)))))
 
 def pv(name, val):
   print()
@@ -136,3 +147,29 @@ def ple(name, val, err):
   print(name + ":")
   for i in range(len(val)):
     print(str(sigval(val[i], err[i])) + " ± " + str(sigerr(err[i])))
+
+def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
+  b = reg_itc(xval, yval, xerr, yerr)
+  db = reg_itc_err(xval, yval, xerr, yerr)
+  g = reg_grad(xval, yval, xerr, yerr, False)
+  dg = reg_grad_err(xval, yval, xerr, yerr)
+  xBeg = xval[0]
+  xEnd = xval[len(xval)-1]
+  x = []
+  y0 = []
+  y1 = []
+  for i in range(n):
+    x.append(xBeg + (xEnd - xBeg) * i / (n - 1))
+    y0.append( b + g * x[i])
+    y1.append((b - db) + (g + dg) * x[i])
+  plt.title(title)
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
+  plt.plot(x, y0, label="line of fit")
+  plt.plot(x, y1, label="line of error")
+  plt.errorbar(xval, yval, yerr = yerr, xerr = xerr, fmt='x', capsize=2.0)
+  plt.legend()
+  plt.show()
+  print()
+  print("slope: " + str(sigval(g, abs(dg - g))) + " ± " + str(sigerr(abs(dg - g))))
+  print("y-intercept: " + str(sigval(b, abs(db - b))) + " ± " + str(sigerr(abs(db - b))))
