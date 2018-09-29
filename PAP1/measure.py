@@ -123,10 +123,15 @@ def sigerr(err):
     return float("{0:.0e}".format(err))
 
 def sigval(val, err):
-  if (sigerr(err) == 0):
+  _sigerr = sigerr(err)
+  if (_sigerr == 0):
     return val
-  else:  
-    return round(val, 1 - int(m.floor(m.log10(sigerr(err)))))
+  else:
+    if (int("{0:.0e}".format(err)[0]) < 3):
+      round2 = 1
+    else:
+      round2 = 0
+    return round(val, round2 - int(m.floor(m.log10(_sigerr))))
 
 def pv(name, val):
   print()
@@ -171,5 +176,5 @@ def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
   plt.legend()
   plt.show()
   print()
-  print("slope: " + str(sigval(g, abs(dg - g))) + " ± " + str(sigerr(abs(dg - g))))
-  print("y-intercept: " + str(sigval(b, abs(db - b))) + " ± " + str(sigerr(abs(db - b))))
+  print("slope: " + str(sigval(g, dg)) + " ± " + str(sigerr(dg)))
+  print("y-intercept: " + str(sigval(b, db)) + " ± " + str(sigerr(db)))
