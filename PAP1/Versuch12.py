@@ -38,5 +38,12 @@ for i in range(len(m)):
   M.append(m[i] * g * r)
   dM.append(ms.sqrt((m[i] * g * dr)**2 + (m[i] * r * dg)**2 + (g * r * dm[i])**2))
 
+tmp = ms.plot("Versuch 12", "Winkel ϕ", "Drehmoment M", phi, dPhi, M, dM)
+D = tmp[0] * 180 / ms.pi()
+dD = tmp [1] * 180 / ms.pi()
+
+ms.ple("Winkel", phi, dPhi)
 ms.ple("Drehmoment", M, dM)
-ms.plot("Versuch 42", "Drehmoment M", "Winkel ϕ", M, dM, phi, dPhi)
+ms.pve("Richtmoment", D, dD)
+
+# 
