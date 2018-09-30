@@ -136,33 +136,40 @@ def sigval(val, err):
       round2 = 0
     return round(val, round2 - int(m.floor(m.log10(_sigerr))))
 
-def pv(name, val):
-  print()
+def pv(name, val, space=True):
   print(name + ": " + str(val))
+  if space:
+    print()
 
-def pve(name, val, err):
-  print()
+def pve(name, val, err, space=True):
   print(name + ": " + str(sigval(val, err)) + " ± " + str(sigerr(err)))
+  if space:
+    print()
 
-def pl(name, val):
-  print()
+
+def pl(name, val, space=True):
   print(name + ":")
   for i in range(len(val)):
     print(val[i])
+  if space:
+    print()
 
-def ple(name, val, err):
-  print()
+def ple(name, val, err, space=True):
   print(name + ":")
   for i in range(len(val)):
     print(str(sigval(val[i], err[i])) + " ± " + str(sigerr(err[i])))
+  if space:
+    print()
 
 def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
-  b = reg_itc(xval, yval, xerr, yerr)
-  db = reg_itc_err(xval, yval, xerr, yerr)
-  g = reg_grad(xval, yval, xerr, yerr, False)
-  dg = reg_grad_err(xval, yval, xerr, yerr)
   xBeg = xval[0]
   xEnd = xval[len(xval)-1]
+
+  g = reg_grad(xval, yval, xerr, yerr)
+  dg = reg_grad_err(xval, yval, xerr, yerr)
+  b = reg_itc(xval, yval, xerr, yerr)
+  db = reg_itc_err(xval, yval, xerr, yerr)
+
   x = []
   y0 = []
   y1 = []
