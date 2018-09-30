@@ -15,21 +15,21 @@ for i in range(len(m)):
   M.append(m[i] * g * r)
   dM.append(ms.sqrt((m[i] * g * dr)**2 + (m[i] * r * dg)**2 + (g * r * dm[i])**2))
 
-tmp = ms.plot("Versuch 42", "Winkel φ", "Drehmoment M", phi, dPhi, M, dM)
-D = tmp[0] * 180 / ms.pi()
-dD = tmp [1] * 180 / ms.pi()
+ms.plot("Deflecting force determination", "Deflection angle ϕ", "Torque M", phi, dPhi, M, dM)
+D = ms.reg_grad(m, phi, dm, dPhi) * 180 / ms.pi()
+dD = ms.reg_grad_err(m, phi, dm, dPhi) * 180 / ms.pi()
 
-ms.ple("Winkel", phi, dPhi)
-ms.ple("Drehmoment", M, dM)
-ms.pve("Richtmoment", D, dD)
+ms.ple("ϕ", phi, dPhi)
+ms.ple("M", M, dM)
+ms.pve("D", D, dD)
 
 # Trägheitsmoment
 m = 552.3e-3
 dm = 0.1e-3
-r = 104.9e-3 / 2
-dr = 0.5e-3 / 2
-J = m / 2 * r**2
-dJ = r**2 / 2 * ms.sqrt((r * dm)**2 + (2 * m * dr)**2)
+r = 104.9e-3 / 2.0
+dr = 0.5e-3 / 2.0
+J = m / 2.0 * r**2
+dJ = r**2 / 2.0 * ms.sqrt((r * dm)**2 + (2.0 * m * dr)**2)
 
 T1 = [24.10, 23.98, 24.18, 24.02, 24.07]
 T2 = [33.15, 33.50, 33.23, 33.38, 33.09]

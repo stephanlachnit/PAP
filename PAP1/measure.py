@@ -113,6 +113,12 @@ def reg_grad_err(x, y, dx, dy):
   newDy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
   return reg_grad_err_y(x, y, newDy)
 
+def chi2(ve, vo, dv):
+  ch2 = 0
+  for i in range(len(x)):
+    ch2 += (vo - ve)**2 / dy[i]**2
+  return ch2 / len(x);
+
 def sigerr(err):
   if ("{0:.1e}".format(err)[0] == "1" or "{0:.1e}".format(err)[0] == "2"):
     return float("{0:.1e}".format(err))
