@@ -5,9 +5,8 @@ p = 0.00001 # percent change to stop iterations in linear regression
 n = 1000 # number of iteration for plotting functions
 
 pi = m.pi
-
-def sqrt(x):
-  return m.sqrt(x)
+sqrt = m.sqrt
+ln = m.log
 
 def mean_value(x):
   s = 0
@@ -24,102 +23,50 @@ def std_dev_e(x):
 def std_dev_m(x):
   return std_dev_e(x) / sqrt(len(x))
 
-def reg_itc_y(x, y, dy):
+def linreg_iter(x, y, dy):
   s0 = 0
   s1 = 0
   s2 = 0
   s3 = 0
   s4 = 0
   for i in range(len(x)):
-    s0 += 1 / (dy[i] * dy[i])
-    s1 += x[i] / (dy[i] * dy[i])
-    s2 += y[i] / (dy[i] * dy[i])
-    s3 += x[i] * x[i] / (dy[i] * dy[i])
-    s4 += x[i] * y[i] / (dy[i] * dy[i])
-  eta = s0 * s3 - s1 * s1
-  return (s3 * s2 - s1 * s4) / eta
+    s0 += 1 / dy[i]**2
+    s1 += x[i] / dy[i]**2
+    s2 += y[i] / dy[i]**2
+    s3 += x[i]**2 / dy[i]**2
+    s4 += x[i] * y[i] / dy[i]**2
+  eta = s0 * s3 - s1**2
+  slope = (s0 * s4 - s1 * s2) / eta
+  slope_err = m.sqrt(s0 / eta)
+  y_itc = (s3 * s2 - s1 * s4) / eta
+  y_itc_err = m.sqrt(s3 / eta)
+  return [slope, slope_err, y_itc, y_itc_err]
 
-def reg_itc_err_y(x, y, dy):
-  s0 = 0
-  s1 = 0
-  s2 = 0
-  s3 = 0
-  s4 = 0
-  for i in range(len(x)):
-    s0 += 1 / (dy[i] * dy[i])
-    s1 += x[i] / (dy[i] * dy[i])
-    s2 += y[i] / (dy[i] * dy[i])
-    s3 += x[i] * x[i] / (dy[i] * dy[i])
-    s4 += x[i] * y[i] / (dy[i] * dy[i])
-  eta = s0 * s3 - s1 * s1
-  return m.sqrt(s3 / eta)
+def linreg(x, y, dy, dx = []):
+  iter0 = linreg_iter(x, y, dy)
+  if (dx == []):
+    return iter0
+  else:
+    g = iter0[0]
+    g_old = g * (1 - 2 * p)
+    while (abs(1 - g_old / g) >= p):
+      g_old = g
+      dy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
+      g = linreg_iter(x, y, dy)[0]
+    return linreg_iter(x, y, dy)
 
-def reg_grad_y(x, y, dy):
-  s0 = 0
-  s1 = 0
-  s2 = 0
-  s3 = 0
-  s4 = 0
-  for i in range(len(x)):
-    s0 += 1 / (dy[i] * dy[i])
-    s1 += x[i] / (dy[i] * dy[i])
-    s2 += y[i] / (dy[i] * dy[i])
-    s3 += x[i] * x[i] / (dy[i] * dy[i])
-    s4 += x[i] * y[i] / (dy[i] * dy[i])
-  eta = s0 * s3 - s1 * s1
-  return (s0 * s4 - s1 * s2) / eta
+def lin_yerr(x, dx, y, dy):
+  g = linreg(x, y, dx, dy)
+  new_dy = [m.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
+  return new_dy
 
-def reg_grad_err_y(x, y, dy):
-  s0 = 0
-  s1 = 0
-  s2 = 0
-  s3 = 0
-  s4 = 0
-  for i in range(len(x)):
-    s0 += 1 / (dy[i] * dy[i])
-    s1 += x[i] / (dy[i] * dy[i])
-    s2 += y[i] / (dy[i] * dy[i])
-    s3 += x[i] * x[i] / (dy[i] * dy[i])
-    s4 += x[i] * y[i] / (dy[i] * dy[i])
-  eta = s0 * s3 - s1 * s1
-  return m.sqrt(s0 / eta)
-
-def reg_itc(x, y, dx, dy):
-  g = reg_grad(x, y, dx, dy, False)
-  newDy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
-  return reg_itc_y(x, y, newDy)
-
-def reg_itc_err(x, y, dx, dy):
-  g = reg_grad(x, y, dx, dy, False)
-  newDy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
-  return reg_itc_err_y(x, y, newDy)
-
-def reg_grad(x, y, dx, dy, print_g=False):
-  g = reg_grad_y(x, y, dy)
-  if print_g:
-    print("g = " + str(g))
-  gOld = 2 * g
-  while abs(1 - gOld / g) > p:
-    gOld = g
-    newDy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
-    g = reg_grad_y(x, y, newDy)
-    if print_g:
-      print("g = " + str(g))
-  return g
-
-def reg_grad_err(x, y, dx, dy):
-  g = reg_grad(x, y, dx, dy, False)
-  newDy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
-  return reg_grad_err_y(x, y, newDy)
-
-def chi2(x, dx, ye, yo, dy):
-  g = reg_grad(x, yo, dx, dy)
-  dy = [m.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
-
-  ch2 = 0
-  for i in range(len(x)):
-    ch2 += (yo[i] - ye[i])**2 / dy[i]**2
-  return ch2 / len(x);
+def chi2(yo, dyo, ye, dye = []):
+  if (dye == []):
+    dye = [0.0 for i in range(len(ye))]
+  x2 = 0.0
+  for i in range(len(yo)):
+    x2 += (yo[i] - ye[i])**2 / (dyo[i]**2 + dye[i]**2)
+  return x2 / len(ye)
 
 def sigerr(err):
   if ("{0:.1e}".format(err)[0] == "1" or "{0:.1e}".format(err)[0] == "2"):
@@ -148,7 +95,6 @@ def pve(name, val, err, space=True):
   if space:
     print()
 
-
 def pl(name, val, space=True):
   print(name + ":")
   for i in range(len(val)):
@@ -173,15 +119,23 @@ def ps(name, val1, val2, dVal1, dVal2, space=True):
   if space:
     print()
 
-def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
+def plot(title, xlabel, ylabel, xval, yval, yerr, xerr = []):
+  if (xerr == []):
+    xerr = [0.0 for i in range(len(xval))]
+  plt.title(title)
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
+  plt.plot(xval, yval)
+  plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
+  plt.legend()
+  plt.show()
+
+def plot_linreg(title, xlabel, ylabel, xval, yval, yerr, xerr = []):
+  if (xerr == []):
+    xerr = [0.0 for i in range(len(xval))]
   xBeg = xval[0]
   xEnd = xval[len(xval)-1]
-
-  g = reg_grad(xval, yval, xerr, yerr)
-  dg = reg_grad_err(xval, yval, xerr, yerr)
-  b = reg_itc(xval, yval, xerr, yerr)
-  db = reg_itc_err(xval, yval, xerr, yerr)
-
+  [g, dg, b, db] = linreg(xval, yval, yerr, xerr)
   x = []
   y0 = []
   y1 = []
@@ -193,7 +147,7 @@ def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
   plt.plot(x, y0, label="line of best fit")
-  plt.plot(x, y1, label="line of fitting error")
+  plt.plot(x, y1, label="line of uncertanty")
   plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()

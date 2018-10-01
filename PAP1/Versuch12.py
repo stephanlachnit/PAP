@@ -25,7 +25,7 @@ mbp = 679.00e-3
 dmbp = 0.20e-3
 T = [[46.56, 46.64, 46.62], [46.75, 46.73, 46.64], [47.54, 47.39, 47.39], [48.39, 48.20, 48.32], [49.96, 50.17, 50.09], [52.50, 52.48, 52.46]]
 a = [0.0e-3, 5.7e-3, 11.8e-3, 18.6e-3, 29.9e-3, 36.8e-3]
-da = [2.0e-3, 2.0e-3, 2.0e-3, 2.0e-3, 2.0e-3, 2.0e-3]
+da = [0.6e-3, 0.6e-3, 0.6e-3, 0.6e-3, 0.6e-3, 0.6e-3]
 
 # Measurement series reduction
 dT1 = ms.std_dev_m(T1) / 20
@@ -46,13 +46,9 @@ for i in range(len(m)):
 Dt = ms.reg_grad(phi, M, dPhi, dM) * 180.0 / ms.pi
 dDt = ms.reg_grad_err(phi, M, dPhi, dM) * 180.0 / ms.pi
 
-#ms.ple("ϕ", phi, dPhi)
-#ms.ple("M", M, dM)
-#ms.pve("D", Dt, dDt)
-#print()
-
-#ms.plot("Deflecting force determination", "Deflection angle ϕ", "Torque M", phi, dPhi, M, dM)
-
+#ms.ple("torque", M, dM)
+#ms.pve("deflection force", Dt, dDt)
+#ms.ps("linreg vs graph", 0.0217, 0.0004, Dt, dDt)
 
 # 1.2 Deflecting force determination by period time measurement
 Jd = md / 2.0 * rd**2
@@ -61,21 +57,19 @@ dJd = rd * ms.sqrt((0.5 * rd * dmd)**2 + (md * drd)**2)
 Dp = 4.0 * ms.pi**2 * Jd / (T2**2 - T1**2)
 dDp = 4.0 * ms.pi**2 / (T2**2 - T1**2) * ms.sqrt(dJd**2 + ((2.0 * Jd * T1 * dT1)**2 + (2.0 * Jd * T2 * dT2)**2) / (T2**2 - T1**2)**2)
 
-#ms.pve("T1", T1, dT1, False)
-#ms.pve("T2", T2, dT2, False)
-#print(J)
-#ms.pve("Jd", Jd, dJd, False)
-#ms.pve("D", Dp, dDp)
-#print()
+print()
+ms.pve("T1", T1, dT1, False)
+ms.pve("T2", T2, dT2)
+ms.pve("Jd", Jd, dJd)
+ms.pve("Dp", Dp, dDp)
 
 # Deviation between 1.1 and 1.2
-dD = max([dDt, dDp])
-sigmaD = abs(Dt - Dp) / dD
+ms.ps("Deviation", Dt, Dp, dDt, dDp, False)
+D = ms.mean_value([Dt, Dp])
+dD =1 / 2 * ms.sqrt(dDt**2 + dDp**2)
+ms.pve("Mean Value", D, dD)
 
-ms.ps("D", Dt, Dp, dDt, dDp)
-
-
-# 2 Verification of the theorem of Steiner by moment of inertia-center of mass distance-dependence measurement
+# 2 Verification of the theorem of Steiner
 a2 = []
 da2 = []
 J = []
@@ -85,15 +79,15 @@ dJt = []
 for i in range(len(T)):
   a2.append(a[i]**2)
   da2.append(2.0 * abs(a[i] * da[i]))
-  J.append(Dt / (4.0 * ms.pi**2) * (T[i]**2 - T1**2))
-  dJ.append(ms.sqrt((Dt * T1 * dT1)**2 + (Dt * T[i] * dT[i])**2 + ((T[i]**2 - T1**2) * dDt)**2 / 4.0) / (2.0 * ms.pi**2))
+  J.append(D / (4.0 * ms.pi**2) * (T[i]**2 - T1**2))
+  dJ.append(ms.sqrt((D * T1 * dT1)**2 + (D * T[i] * dT[i])**2 + ((T[i]**2 - T1**2) * dD)**2 / 4.0) / (2.0 * ms.pi**2))
   Jt.append(J[0] + mbp * a2[i])
   dJt.append(ms.sqrt(dJ[0]**2 + (a2[i] * dmbp)**2 + (mbp * da2[i])**2))
 
 ms.ple("T", T, dT)
 ms.ple("a2", a2, da2)
 ms.ple("J", J, dJ)
-ms.ple("dJt", Jt, dJt)
+ms.ple("Jt", Jt, dJt)
 
 a2.pop(0)
 da2.pop(0)
@@ -109,5 +103,5 @@ for i in range(len(a2)):
   ms.pv("p", abs(1.0 - J[i] / Jt[i]) * 100.0, False)
 print()
 
-chi2 = ms.chi2(a2, da2, Jt, J, [max(dJ[i], dJt[i]) for i in range(len(a2))])
-ms.pv("chi2", chi2)
+chi2 = ms.chi2(J, ms.lin_yerr(a2, da2, J, dJ), Jt, ms.lin_yerr(a2, da2, Jt, dJt))
+ms.pv("chi2", chi2, False)
