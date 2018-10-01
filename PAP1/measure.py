@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 p = 0.00001 # percent change to stop iterations in linear regression
 n = 1000 # number of iteration for plotting functions
 
+pi = m.pi
+
 def sqrt(x):
   return m.sqrt(x)
-
-def pi():
-  return m.pi
 
 def mean_value(x):
   s = 0
@@ -113,10 +112,13 @@ def reg_grad_err(x, y, dx, dy):
   newDy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
   return reg_grad_err_y(x, y, newDy)
 
-def chi2(ve, vo, dv):
+def chi2(x, dx, ye, yo, dy):
+  g = reg_grad(x, yo, dx, dy)
+  dy = [m.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
+
   ch2 = 0
   for i in range(len(x)):
-    ch2 += (vo - ve)**2 / dy[i]**2
+    ch2 += (yo[i] - ye[i])**2 / dy[i]**2
   return ch2 / len(x);
 
 def sigerr(err):
@@ -161,6 +163,16 @@ def ple(name, val, err, space=True):
   if space:
     print()
 
+def ps(name, val1, val2, dVal1, dVal2, space=True):
+  dVal = max([dVal1, dVal2])
+  sigma = abs(val1 - val2) / dVal
+  if sigma == 0:
+    print(name + ": " + str(0.0) + "σ")
+  else:
+    print(name + ": " + str(sigval(sigma, pow(10, int(m.log10(sigma)) - 1))) + "σ")
+  if space:
+    print()
+
 def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
   xBeg = xval[0]
   xEnd = xval[len(xval)-1]
@@ -180,8 +192,8 @@ def plot(title, xlabel, ylabel, xval, xerr, yval, yerr):
   plt.title(title)
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
-  plt.plot(x, y0, label="line of fit")
-  plt.plot(x, y1, label="line of error")
+  plt.plot(x, y0, label="line of best fit")
+  plt.plot(x, y1, label="line of fitting error")
   plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()
