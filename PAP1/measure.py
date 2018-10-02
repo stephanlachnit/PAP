@@ -7,6 +7,7 @@ n = 1000 # number of iteration for plotting functions
 pi = m.pi
 sqrt = m.sqrt
 ln = m.log
+lg = m.log10
 
 def mean_value(x):
   s = 0
@@ -119,7 +120,7 @@ def ps(name, val1, val2, dVal1, dVal2, space=True):
   if space:
     print()
 
-def plot(title, xlabel, ylabel, xval, yval, yerr, xerr = []):
+def plot(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = ""):
   if (xerr == []):
     xerr = [0.0 for i in range(len(xval))]
   plt.title(title)
@@ -130,7 +131,7 @@ def plot(title, xlabel, ylabel, xval, yval, yerr, xerr = []):
   plt.legend()
   plt.show()
 
-def plot_linreg(title, xlabel, ylabel, xval, yval, yerr, xerr = []):
+def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = ""):
   if (xerr == []):
     xerr = [0.0 for i in range(len(xval))]
   xBeg = xval[0]
@@ -147,7 +148,7 @@ def plot_linreg(title, xlabel, ylabel, xval, yval, yerr, xerr = []):
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
   plt.plot(x, y0, label="line of best fit")
-  plt.plot(x, y1, label="line of uncertanty")
+  plt.plot(x, y1, label="line of uncertainty")
   plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()
