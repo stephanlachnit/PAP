@@ -69,64 +69,48 @@ def chi2(yo, dyo, ye, dye = []):
     x2 += (yo[i] - ye[i])**2 / (dyo[i]**2 + dye[i]**2)
   return x2 / len(ye)
 
-def sigerr(err):
+def sigval(val, err = 0.0):
   if ("{0:.1e}".format(err)[0] == "1" or "{0:.1e}".format(err)[0] == "2"):
-    return float("{0:.1e}".format(err))
+    sigerr = float("{0:.1e}".format(err))
   else:
-    return float("{0:.0e}".format(err))
-
-def sigval(val, err):
-  _sigerr = sigerr(err)
-  if (_sigerr == 0):
-    return val
+    sigerr = float("{0:.0e}".format(err))
+  if (sigerr == 0.0):
+    return str(val)
   else:
     if (int("{0:.0e}".format(err)[0]) < 3):
       round2 = 1
     else:
       round2 = 0
-    return round(val, round2 - int(m.floor(m.log10(_sigerr))))
+    return str(round(val, round2 - int(m.floor(m.log10(sigerr))))) + " ± " + str(sigerr)
 
-def pv(name, val, space=True):
-  print(name + ": " + str(val))
-  if space:
-    print()
+def val(name, val, err = 0.0):
+  return name + ": " + sigval(val, err)
 
-def pve(name, val, err, space=True):
-  print(name + ": " + str(sigval(val, err)) + " ± " + str(sigerr(err)))
-  if space:
-    print()
-
-def pl(name, val, space=True):
-  print(name + ":")
+def lst(name, val, err = []):
+  if (err == []):
+    err = [0.0 for i in range(len(val))]
+  tmp = name + ":"
   for i in range(len(val)):
-    print(val[i])
-  if space:
-    print()
+    tmp +=  "\n" + sigval(val[i], err[i])
+  return tmp
 
-def ple(name, val, err, space=True):
-  print(name + ":")
-  for i in range(len(val)):
-    print(str(sigval(val[i], err[i])) + " ± " + str(sigerr(err[i])))
-  if space:
-    print()
-
-def ps(name, val1, val2, dVal1, dVal2, space=True):
+def sig(name, val1, val2, dVal1, dVal2 = 0.0):
   dVal = max([dVal1, dVal2])
   sigma = abs(val1 - val2) / dVal
   if sigma == 0:
-    print(name + ": " + str(0.0) + "σ")
+    return name + ": " + str(0.0) + "σ"
   else:
-    print(name + ": " + str(sigval(sigma, pow(10, int(m.log10(sigma)) - 1))) + "σ")
-  if space:
-    print()
+    return name + ": " + str(float("{0:.1e}".format(sigma))) + "σ"
 
-def plot(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = ""):
+def plot(xval, yval, yerr = [], xerr = [], title = "", xlabel = "", ylabel = "", label = ""):
   if (xerr == []):
     xerr = [0.0 for i in range(len(xval))]
+  if (yerr == []):
+    yerr = [0.0 for i in range(len(yval))]
   plt.title(title)
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
-  plt.plot(xval, yval)
+  plt.plot(xval, yval, label=label)
   plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()
@@ -145,7 +129,7 @@ def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = "
     y0.append( b + g * x[i])
     y1.append((b - db) + (g + dg) * x[i])
   plt.title(title)
-  plt.xlabel(xlabel)
+  plt.xlabel(xlabel) # make use of plot
   plt.ylabel(ylabel)
   plt.plot(x, y0, label="line of best fit")
   plt.plot(x, y1, label="line of uncertainty")
