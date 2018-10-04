@@ -8,6 +8,7 @@ pi = m.pi
 sqrt = m.sqrt
 ln = m.log
 lg = m.log10
+arctan = m.atan
 
 def mean_value(x):
   s = 0
@@ -94,13 +95,18 @@ def lst(name, val, err = []):
     tmp +=  "\n" + sigval(val[i], err[i])
   return tmp
 
-def sig(name, val1, val2, dVal1, dVal2 = 0.0):
+def sig(name, val1, dVal1, val2, dVal2 = 0.0):
   dVal = max([dVal1, dVal2])
   sigma = abs(val1 - val2) / dVal
   if sigma == 0:
     return name + ": " + str(0.0) + "σ"
   else:
-    return name + ": " + str(float("{0:.1e}".format(sigma))) + "σ"
+    if (sigma < 0.95):
+      return name + ": " + str(float("{0:.0e}".format(sigma))) + "σ"
+    elif (sigma < 3.95):
+      return name + ": " + str(float("{0:.1e}".format(sigma))) + "σ"
+    else:
+      return name + ": " + str(int(round(sigma, 0))) + "σ"
 
 def plot(xval, yval, yerr = [], xerr = [], title = "", xlabel = "", ylabel = "", label = ""):
   if (xerr == []):
@@ -129,11 +135,10 @@ def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = "
     y0.append( b + g * x[i])
     y1.append((b - db) + (g + dg) * x[i])
   plt.title(title)
-  plt.xlabel(xlabel) # make use of plot
+  plt.xlabel(xlabel)
   plt.ylabel(ylabel)
   plt.plot(x, y0, label="line of best fit")
   plt.plot(x, y1, label="line of uncertainty")
   plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
   plt.legend()
   plt.show()
-  return [g, dg, b, db]
