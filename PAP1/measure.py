@@ -132,7 +132,7 @@ def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = "
   y1 = []
   for i in range(n):
     x.append(xBeg + (xEnd - xBeg) * i / (n - 1))
-    y0.append( b + g * x[i])
+    y0.append(b + g * x[i])
     y1.append((b - db) + (g + dg) * x[i])
   plt.title(title)
   plt.xlabel(xlabel)
