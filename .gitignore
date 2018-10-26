@@ -1,6 +1,1 @@
-﻿################################################################################
-# Diese .gitignore-Datei wurde von Microsoft(R) Visual Studio automatisch erstellt.
-################################################################################
-
-/PAP1/__pycache__
-/.vs
+﻿/__pycache__
