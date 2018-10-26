@@ -1,4 +1,4 @@
-from measure import *
+from measure import h,e,c,val,lst,sqrt
 
 # 1. Nebenserie
 wl = [819e-9]
