@@ -1,1 +1,1 @@
-# ap_praktikum
+# PAP Scripts
