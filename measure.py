@@ -99,7 +99,10 @@ def lst(name, val, err = []):
   return tmp
 
 def sig(name, val1, dVal1, val2, dVal2 = 0.0):
-  sigma = abs(val1 - val2) / sqrt(dVal1**2 * dVal2**2)
+  sigma = sqrt(dVal1**2 * dVal2**2)
+  if (sigma == 0.0):
+    return "∞σ"
+  sigma = abs(val1 - val2) / sigma
   if sigma == 0:
     return name + ": " + str(0.0) + "σ"
   else:
@@ -110,20 +113,25 @@ def sig(name, val1, dVal1, val2, dVal2 = 0.0):
     else:
       return name + ": " + str(int(round(sigma, 0))) + "σ"
 
+def initplot(title="", xlabel="", ylabel="", figure=0):
+  plt.figure(figure)
+  plt.title(title)
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
+
+def showplot():
+  plt.legend()
+  plt.show()
+
 def plot(xval, yval, yerr = [], xerr = [], title = "", xlabel = "", ylabel = "", label = ""):
   if (xerr == []):
     xerr = [0.0 for i in range(len(xval))]
   if (yerr == []):
     yerr = [0.0 for i in range(len(yval))]
-  plt.title(title)
-  plt.xlabel(xlabel)
-  plt.ylabel(ylabel)
-  plt.plot(xval, yval, label=label)
-  plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
-  plt.legend()
-  plt.show()
+  plt.errorbar(xval, yval, yerr, xerr, label=label, fmt='o', markersize=4)
 
-def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = ""):
+def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = "", figure=0):
+  plt.figure(figure)
   if (xerr == []):
     xerr = [0.0 for i in range(len(xval))]
   xBeg = xval[0]
@@ -141,7 +149,7 @@ def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = "
   plt.ylabel(ylabel)
   plt.plot(x, y0, label="line of best fit")
   plt.plot(x, y1, label="line of uncertainty")
-  plt.errorbar(xval, yval, yerr, xerr, fmt='x', capsize=2.0)
+  plt.errorbar(xval, yval, yerr, xerr, fmt='o', markersize=4)
   plt.legend()
   plt.show()
   
