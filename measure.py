@@ -104,7 +104,7 @@ def sig(name, val1, dVal1, val2, dVal2 = 0.0):
     return name + ": ∞σ"
   sigma = abs(val1 - val2) / sigma
   if sigma == 0:
-    return name + ": " + str(0.0) + "σ"
+    return name + ": 0σ"
   else:
     if (sigma < 0.95):
       return name + ": " + str(float("{0:.0e}".format(sigma))) + "σ"
