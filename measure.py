@@ -85,6 +85,7 @@ def sigval(val, err = 0.0):
       round2 = 1
     else:
       round2 = 0
+      # To do: use "{0:0X.Yf}.format()" to format string
     return str(round(val, round2 - int(m.floor(m.log10(sigerr))))) + " ± " + str(sigerr)
 
 def val(name, val, err = 0.0):
