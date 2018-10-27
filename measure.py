@@ -23,7 +23,7 @@ def std_dev_e(x):
   qs = 0
   for i in range(len(x)):
     qs += (x[i] - mean_value(x))**2
-  return m.sqrt(qs / (len(x) - 1))
+  return sqrt(qs / (len(x) - 1))
 
 def std_dev_m(x):
   return std_dev_e(x) / sqrt(len(x))
@@ -42,9 +42,9 @@ def linreg_iter(x, y, dy):
     s4 += x[i] * y[i] / dy[i]**2
   eta = s0 * s3 - s1**2
   slope = (s0 * s4 - s1 * s2) / eta
-  slope_err = m.sqrt(s0 / eta)
+  slope_err = sqrt(s0 / eta)
   y_itc = (s3 * s2 - s1 * s4) / eta
-  y_itc_err = m.sqrt(s3 / eta)
+  y_itc_err = sqrt(s3 / eta)
   return [slope, slope_err, y_itc, y_itc_err]
 
 def linreg(x, y, dy, dx = []):
@@ -56,13 +56,13 @@ def linreg(x, y, dy, dx = []):
     g_old = g * (1 - 2 * p)
     while (abs(1 - g_old / g) >= p):
       g_old = g
-      dy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
+      dy = [sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
       g = linreg_iter(x, y, dy)[0]
     return linreg_iter(x, y, dy)
 
 def lin_yerr(x, dx, y, dy):
   g = linreg(x, y, dx, dy)
-  new_dy = [m.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
+  new_dy = [sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
   return new_dy
 
 def chi2(yo, dyo, ye, dye = []):
@@ -99,9 +99,9 @@ def lst(name, val, err = []):
   return tmp
 
 def sig(name, val1, dVal1, val2, dVal2 = 0.0):
-  sigma = sqrt(dVal1**2 * dVal2**2)
+  sigma = sqrt(dVal1**2 + dVal2**2)
   if (sigma == 0.0):
-    return "∞σ"
+    return name + ": ∞σ"
   sigma = abs(val1 - val2) / sigma
   if sigma == 0:
     return name + ": " + str(0.0) + "σ"
