@@ -105,6 +105,7 @@ class plot:
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    plt.ticklabel_format(style="sci", axis="both", scilimits=(-3,3))
 
   def plotdata(self, x, y, dy=[], dx=[], label=""):
     if (label != ""):
