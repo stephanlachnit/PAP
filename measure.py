@@ -116,13 +116,9 @@ class plot:
       dy = [0.0 for i in range(len(y))]
     plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=4)
   
-  def plotfunc(self, x, y, dy=[], dx=[], label=""):
+  def plotfunc(self, x, y, label=""):
     if (label != ""):
       self.legend = True
-    if (dx == []):
-      dx = [0.0 for i in range(len(x))]
-    if (dy == []):
-      dy = [0.0 for i in range(len(y))]
     plt.plot(x, y, label=label)
 
   def drawplot(self, show=True):
