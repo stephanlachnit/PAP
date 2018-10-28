@@ -4,12 +4,11 @@ from measure import h,e,c,val,lst,sqrt,plot,sig,chi2,chi2_red
 # Frauenhoferlinien
 # Measured Values
 wl = [393e-9, 397e-9, 430e-9, 486e-9, 517e-9, 527e-9, 656e-9, 687e-9]
-dwl = 1.5e-9
+dwl = 1e-9
 fwl = [393.4e-9, 396.8e-9, 430.8e-9, 486.1e-9, 518.4e-9, 527.0e-9, 656.3e-9, 686.7e-9]
 
 print()
-print("Frauenhoferlinien")
-print()
+print("Frauenhoferlinien:")
 for i in range(len(wl)):
   print(sig("{0:03.1f}".format(fwl[i]*1e9)+"nm", wl[i], dwl, fwl[i]))
 
@@ -146,12 +145,12 @@ print(val("chi2", _chi2))
 print(val("chi2_red", _chi2_red))
 print(val("Wkeit", 1 - sci_chi2.cdf(_chi2, dof)))
 
-qzplot = plot(title="2. Nebenserie", xlabel="Quantenzahl", ylabel="Wellenlänge", figure=3)
-qzplot.plotdata(qz, wl2, dwl2, label="Messwerte")
+wl2plot = plot(title="2. Nebenserie", xlabel="Quantenzahl", ylabel="Wellenlänge", figure=3)
+wl2plot.plotdata(qz, wl2, dwl2, label="Messwerte")
 x = np.linspace(3.8, 10.2, 100)
-qzplot.plotfunc(x, fit_func2(x,*popt), label="Fitfunktion")
-qzplot.drawplot()
-qzplot.saveplot("2. Nebenserie.pdf")
+wl2plot.plotfunc(x, fit_func2(x,*popt), label="Fitfunktion")
+wl2plot.drawplot()
+wl2plot.saveplot("2. Nebenserie.pdf")
 
 # Abweichung
 print()
@@ -159,4 +158,4 @@ print("Abweichung der Fitwerte:")
 print(sig("Ery", Ery1, dEry1, Ery2, dEry2))
 print(sig("E3p", E3p1, dE3p1, E3p2, dE3p2))
 
-#plot.showplots()
+plot.showplots()
