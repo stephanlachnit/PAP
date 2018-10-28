@@ -1,4 +1,4 @@
-# measure version 1.2
+# measure version 1.3
 
 # Significant values
 bval = False
@@ -21,7 +21,7 @@ if (bsig == True):
   print("Deviation between values")
   x1 = 3.4
   d1 = 0.1
-  x2 = 3.44
+  x2 = 3.404
   print(sig("small deviation", x1, d1, x2))
   x1 = 9.7e3
   d1 = 1.7e3
@@ -46,21 +46,6 @@ if (bconstants == True):
   from measure import h,dh
   print(val("Plancl's constant", h, dh))
 
-# Linear regression
-blinreg = False
-bplotlinreg = True
-if (blinreg == True):
-  from measure import linreg
-  print()
-  print("Linear regression")
-  n = 10
-  x = [i for i in range(n)]
-  dx = [0.1 for i in range(n)]
-  y = [2 + i**1.1 for i in range(n)]
-  dy = [0.5 for i in range(n)]
-  res = linreg(x, y, dy, dx, plot=bplotlinreg, title="measure test", xlabel="xlabel", ylabel="ylabel")
-  [slope, slope_err, y_itc, y_itc_err] = res
-
 # Plot data
 bplotdata = False
 if (bplotdata == True):
@@ -74,3 +59,32 @@ if (bplotdata == True):
   from measure import plot
   print()
   print("Plot functions")
+
+# Linear regression w/o plot
+blinreg = False
+if (blinreg == True):
+  from measure import linreg,val
+  print()
+  print("Linear regression w/o plot")
+  n = 10
+  x = [i for i in range(n)]
+  dx = [0.1 for i in range(n)]
+  y = [2 + i**1.1 for i in range(n)]
+  dy = [0.5 for i in range(n)]
+  [slope, slope_err, y_itc, y_itc_err] = linreg(x, y, dy, dx)
+  print(val("slope", slope, slope_err))
+  print(val("y_intercept", y_itc, y_itc_err))
+
+# Linear regression w/ plot
+blinregplot = False
+if (blinregplot == True):
+  from measure import linreg,plot
+  print()
+  print("Linear regression w/ plot")
+  n = 10
+  x = [i for i in range(n)]
+  dx = [0.1 for i in range(n)]
+  y = [2 + i**0.9 for i in range(n)]
+  dy = [0.5 for i in range(n)]
+  [g, dg, b, db, linregplot] = linreg(x, y, dy, dx, drawplot=True, title="Linear regression")
+  plot.showplots()
