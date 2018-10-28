@@ -1,4 +1,4 @@
-### measure Python 3 libraby version 1.0
+### measure Python 3 libraby version 1.1
 import math as m
 import matplotlib.pyplot as plt
 
@@ -97,6 +97,7 @@ def linreg(x, y, dy, dx = [], plot = False, title = "", xlabel = "", ylabel = ""
     b = (s3 * s2 - s1 * s4) / eta
     db = m.sqrt(s3 / eta)
     return [g, dg, b, db]
+
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
@@ -154,14 +155,14 @@ class plot:
     plt.legend()
     plt.show()
 
-  def dataplot(self, x, y, dy = [], dx = [], label = ""):
+  def plotdata(self, x, y, dy = [], dx = [], label = ""):
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
       dy = [0.0 for i in range(len(y))]
     plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=4)
   
-  def funcplot(self, x, y, dy=[], dx = [], label = ""):
+  def plotfunc(self, x, y, dy=[], dx = [], label = ""):
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
