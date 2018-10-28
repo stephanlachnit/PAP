@@ -81,7 +81,7 @@ def sig(name, val1, dVal1, val2, dVal2=0.0):
       digits = 1
     else:
       digits = 0
-    sigstr = "{:.{digits}g}".format(sigma, digits = digits)
+    sigstr = "{:.{digits}f}".format(sigma, digits = digits)
   return name + ": " + sigstr + "σ"
 
 def chi2(yo, dyo, ye, dye=[]):
