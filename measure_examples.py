@@ -1,4 +1,4 @@
-# measure version 1.1
+# measure version 1.2
 
 # Significant values
 bval = False

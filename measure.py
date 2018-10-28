@@ -1,4 +1,4 @@
-### measure Python 3 libraby version 1.1
+### measure Python 3 libraby version 1.2
 import math as m
 import matplotlib.pyplot as plt
 
@@ -112,6 +112,7 @@ def linreg(x, y, dy, dx = [], plot = False, title = "", xlabel = "", ylabel = ""
     result = linreg_iter(x, y, dy)
   if (plot == True):
     plt.figure(figure)
+    plt.clf()
     [g, dg, b, db] = result
     xn = len(x) - 1
     xint = [x[0] - dx[0], x[xn] + dx[xn]]
@@ -146,16 +147,24 @@ def chi2_red(yo, dyo, ye, dye = [], xo = [], dxo = [], xe = [], dxe = []):
 
 class plot:
   def __init__(self, title="", xlabel="", ylabel="", figure=1):
-    plt.figure(figure)
+    self.figure = plt.figure(figure)
+    self.legend = False
+    plt.clf()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-  def showplot(self):
-    plt.legend()
-    plt.show()
+  def showplot(self, show=True):
+    if (show == True):
+      if (self.legend == True):
+        plt.legend()
+      plt.show()
+    else:
+      plt.close(self.figure)
 
   def plotdata(self, x, y, dy = [], dx = [], label = ""):
+    if (label != ""):
+      self.legend = True
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
@@ -163,6 +172,8 @@ class plot:
     plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=4)
   
   def plotfunc(self, x, y, dy=[], dx = [], label = ""):
+    if (label != ""):
+      self.legend = True
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
