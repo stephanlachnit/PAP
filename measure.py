@@ -1,156 +1,170 @@
+### measure Python 3 libraby version 1.0
 import math as m
 import matplotlib.pyplot as plt
 
-p = 0.00001 # percent change to stop iterations in linear regression
-n = 1000 # number of iteration for plotting functions
+# Settings
+linreg_change = 0.00001 # min relative change per step to end linear regression
 
-pi = m.pi
+# Variables for export
 sqrt = m.sqrt
+exp = m.exp
 ln = m.log
 lg = m.log10
+sin = m.sin
+cos = m.cos
+tan = m.tan
 arctan = m.atan
-c = 299792458
-h = 6.626070040e-34
-e = 1.6021766208e-19
+pi = m.pi
+euler_e = m.e
+c = 2.99792458e8 # Speed of light
+h = 6.626070040e-34 # Planck's constant
+dh = 8.1e-42 # Uncertanty of Planck's constant
+e = 1.6021766208e-19 # Elementary charge
+de = 9.8e-28 # Uncertanty of the elementary charge
 
 def mean_value(x):
-  s = 0
+  s = 0.0
   for i in range(len(x)):
     s += x[i]
   return s / len(x)
 
 def std_dev_e(x):
-  qs = 0
+  qs = 0.0
   for i in range(len(x)):
     qs += (x[i] - mean_value(x))**2
-  return sqrt(qs / (len(x) - 1))
+  return m.sqrt(qs / (len(x) - 1))
 
 def std_dev_m(x):
-  return std_dev_e(x) / sqrt(len(x))
+  return std_dev_e(x) / m.sqrt(len(x))
 
-def linreg_iter(x, y, dy):
-  s0 = 0
-  s1 = 0
-  s2 = 0
-  s3 = 0
-  s4 = 0
-  for i in range(len(x)):
-    s0 += 1 / dy[i]**2
-    s1 += x[i] / dy[i]**2
-    s2 += y[i] / dy[i]**2
-    s3 += x[i]**2 / dy[i]**2
-    s4 += x[i] * y[i] / dy[i]**2
-  eta = s0 * s3 - s1**2
-  slope = (s0 * s4 - s1 * s2) / eta
-  slope_err = sqrt(s0 / eta)
-  y_itc = (s3 * s2 - s1 * s4) / eta
-  y_itc_err = sqrt(s3 / eta)
-  return [slope, slope_err, y_itc, y_itc_err]
-
-def linreg(x, y, dy, dx = []):
-  iter0 = linreg_iter(x, y, dy)
-  if (dx == []):
-    return iter0
+def signval(val, err = 0.0):
+  if (err == 0.0):
+    return "{:f}".format(val)
+  if ("{:.1e}".format(err)[0] == "9" and "{:.0e}".format(err)[0] == "1"):
+    err = float("{:.0e}".format(err))
+  firstdigit = int("{:.1e}".format(err)[0])
+  if (firstdigit <= 2):
+    round2 = 1
+    errstr = "{:=.1e}".format(err)
   else:
-    g = iter0[0]
-    g_old = g * (1 - 2 * p)
-    while (abs(1 - g_old / g) >= p):
-      g_old = g
-      dy = [sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
-      g = linreg_iter(x, y, dy)[0]
-    return linreg_iter(x, y, dy)
-
-def lin_yerr(x, dx, y, dy):
-  g = linreg(x, y, dx, dy)
-  new_dy = [sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
-  return new_dy
-
-def chi2(yo, dyo, ye, dye = []):
-  if (dye == []):
-    dye = [0.0 for i in range(len(ye))]
-  x2 = 0.0
-  for i in range(len(yo)):
-    x2 += (yo[i] - ye[i])**2 / (dyo[i]**2 + dye[i]**2)
-  return x2 / len(ye)
-
-def sigval(val, err = 0.0):
-  if ("{0:.1e}".format(err)[0] == "1" or "{0:.1e}".format(err)[0] == "2"):
-    sigerr = float("{0:.1e}".format(err))
-  else:
-    sigerr = float("{0:.0e}".format(err))
-  if (sigerr == 0.0):
-    return str(val)
-  else:
-    if (int("{0:.0e}".format(err)[0]) < 3):
-      round2 = 1
-    else:
-      round2 = 0
-      # To do: use "{0:0X.Yf}.format()" to format string
-    return str(round(val, round2 - int(m.floor(m.log10(sigerr))))) + " ± " + str(sigerr)
+    round2 = 0
+    errstr = "{:=.0e}".format(err)
+  expdiff = int(abs(m.floor(m.log10(val)) - m.floor(m.log10(err))) + round2)
+  valstr = "{:=.{digits}e}".format(val, digits = expdiff)
+  return valstr + " ± " + errstr
 
 def val(name, val, err = 0.0):
-  return name + ": " + sigval(val, err)
+  return name + ": " + signval(val, err)
 
 def lst(name, val, err = []):
   if (err == []):
     err = [0.0 for i in range(len(val))]
   tmp = name + ":"
   for i in range(len(val)):
-    tmp +=  "\n" + sigval(val[i], err[i])
+    tmp +=  "\n" + signval(val[i], err[i])
   return tmp
 
 def sig(name, val1, dVal1, val2, dVal2 = 0.0):
-  sigma = sqrt(dVal1**2 + dVal2**2)
-  if (sigma == 0.0):
-    return name + ": ∞σ"
-  sigma = abs(val1 - val2) / sigma
-  if sigma == 0:
-    return name + ": 0σ"
+  nominator = abs(val1 - val2)
+  denominator = m.sqrt(dVal1**2 + dVal2**2)
+  if (nominator == 0.0):
+    sigstr = "0"
+  elif (denominator == 0.0):
+    sigstr = "∞"
   else:
+    sigma = nominator / denominator
     if (sigma < 0.95):
-      return name + ": " + str(float("{0:.0e}".format(sigma))) + "σ"
+      digits = int(abs(m.floor(m.log10(sigma))))
     elif (sigma < 3.95):
-      return name + ": " + str(float("{0:.1e}".format(sigma))) + "σ"
+      digits = 1
     else:
-      return name + ": " + str(int(round(sigma, 0))) + "σ"
+      digits = 0
+    sigstr = "{:=1.{digits}f}".format(sigma, digits = digits)
+  return name + ": " + sigstr + "σ"
 
-def initplot(title="", xlabel="", ylabel="", figure=0):
-  plt.figure(figure)
-  plt.title(title)
-  plt.xlabel(xlabel)
-  plt.ylabel(ylabel)
+def linreg(x, y, dy, dx = [], plot = False, title = "", xlabel = "", ylabel = "", figure=1):
+  def linreg_iter(x, y, dy):
+    [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
+    for i in range(len(x)):
+      s0 += 1 / dy[i]**2
+      s1 += x[i] / dy[i]**2
+      s2 += y[i] / dy[i]**2
+      s3 += x[i]**2 / dy[i]**2
+      s4 += x[i] * y[i] / dy[i]**2
+    eta = s0 * s3 - s1**2
+    g = (s0 * s4 - s1 * s2) / eta
+    dg = m.sqrt(s0 / eta)
+    b = (s3 * s2 - s1 * s4) / eta
+    db = m.sqrt(s3 / eta)
+    return [g, dg, b, db]
+  iter0 = linreg_iter(x, y, dy)
+  result = []
+  if (dx == []):
+    result = iter0
+  else:
+    g = iter0[0]
+    g_old = g * (1 - 2 * linreg_change)
+    while (abs(1 - g_old / g) >= linreg_change):
+      g_old = g
+      dy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
+      g = linreg_iter(x, y, dy)[0]
+    result = linreg_iter(x, y, dy)
+  if (plot == True):
+    plt.figure(figure)
+    [g, dg, b, db] = result
+    xn = len(x) - 1
+    xint = [x[0] - dx[0], x[xn] + dx[xn]]
+    yfit = [g * xint[i] + b for i in range(2)]
+    yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.plot(xint, yfit, label="line of best fit")
+    plt.plot(xint, yerr, label="line of uncertainty")
+    plt.errorbar(x, y, dy, dx, fmt='o', markersize=4)
+    plt.legend()
+    plt.show()
+  return result
 
-def showplot():
-  plt.legend()
-  plt.show()
+def lin_yerr(x, dx, y, dy):
+  g = linreg(x, y, dx, dy)
+  new_dy = [m.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
+  return new_dy
 
-def plot(xval, yval, yerr = [], xerr = [], title = "", xlabel = "", ylabel = "", label = ""):
-  if (xerr == []):
-    xerr = [0.0 for i in range(len(xval))]
-  if (yerr == []):
-    yerr = [0.0 for i in range(len(yval))]
-  plt.errorbar(xval, yval, yerr, xerr, label=label, fmt='o', markersize=4)
+def chi2_red(yo, dyo, ye, dye = [], xo = [], dxo = [], xe = [], dxe = []):
+  if (dye == []):
+    dye = [0.0 for i in range(len(ye))]
+  if (xo != []):
+    dyo = lin_yerr(xo, dxo, yo, dyo)
+  if (xe != []):
+    dye = lin_yerr(xe, dxe, ye, dye)
+  chi2 = 0.0
+  for i in range(len(yo)):
+    chi2 += (yo[i] - ye[i])**2 / (dyo[i]**2 + dye[i]**2)
+  return chi2 / len(ye)
 
-def plot_linreg(xval, yval, yerr, xerr = [], title = "", xlabel = "", ylabel = "", figure=0):
-  plt.figure(figure)
-  if (xerr == []):
-    xerr = [0.0 for i in range(len(xval))]
-  xBeg = xval[0]
-  xEnd = xval[len(xval)-1]
-  [g, dg, b, db] = linreg(xval, yval, yerr, xerr)
-  x = []
-  y0 = []
-  y1 = []
-  for i in range(n):
-    x.append(xBeg + (xEnd - xBeg) * i / (n - 1))
-    y0.append(b + g * x[i])
-    y1.append((b - db) + (g + dg) * x[i])
-  plt.title(title)
-  plt.xlabel(xlabel)
-  plt.ylabel(ylabel)
-  plt.plot(x, y0, label="line of best fit")
-  plt.plot(x, y1, label="line of uncertainty")
-  plt.errorbar(xval, yval, yerr, xerr, fmt='o', markersize=4)
-  plt.legend()
-  plt.show()
+class plot:
+  def __init__(self, title="", xlabel="", ylabel="", figure=1):
+    plt.figure(figure)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
+  def showplot(self):
+    plt.legend()
+    plt.show()
+
+  def dataplot(self, x, y, dy = [], dx = [], label = ""):
+    if (dx == []):
+      dx = [0.0 for i in range(len(x))]
+    if (dy == []):
+      dy = [0.0 for i in range(len(y))]
+    plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=4)
   
+  def funcplot(self, x, y, dy=[], dx = [], label = ""):
+    if (dx == []):
+      dx = [0.0 for i in range(len(x))]
+    if (dy == []):
+      dy = [0.0 for i in range(len(y))]
+    plt.plot(x, y, label=label)
+    plt.errorbar(x, y, dy, dx, fmt='o', markersize=4)
