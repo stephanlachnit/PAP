@@ -98,14 +98,15 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
   return chi2(yo, dyo, ye, dye) / dof
 
 class plot:
-  def __init__(self, title="", xlabel="x", ylabel="y", figure=1):
+  def __init__(self, title="", xlabel="", ylabel="", figure=1):
     self.figure = plt.figure(figure)
     self.legend = False
     plt.clf()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.ticklabel_format(style="sci", axis="both", scilimits=(-3,3))
+    plt.grid(True)
+    plt.ticklabel_format(style="sci", axis="both", scilimits=(-2,3))
 
   def plotdata(self, x, y, dy=[], dx=[], label=""):
     if (label != ""):
@@ -114,7 +115,7 @@ class plot:
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
       dy = [0.0 for i in range(len(y))]
-    plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=4)
+    plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=3)
   
   def plotfunc(self, x, y, label=""):
     if (label != ""):
@@ -135,7 +136,7 @@ class plot:
   def showplots():
     plt.show()
 
-def linreg(x, y, dy, dx=[], drawplot=False, title="", xlabel="x", ylabel="y", figure=1):
+def linreg(x, y, dy, dx=[], drawplot=False, title="", xlabel="", ylabel="", figure=1):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
