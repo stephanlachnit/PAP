@@ -1,7 +1,7 @@
 # measure version 1.3
 
 # Significant values
-bval = True
+bval = False
 if (bval == True):
   from measure import val
   print()
