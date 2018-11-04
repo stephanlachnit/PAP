@@ -1,11 +1,20 @@
 # measure version 1.3
-from measure import pi,sqrt,val,sig,linreg,plot
+from measure import pi,mean_value,std_dev_m,sqrt,val,sig,linreg,plot
 
 # measured values
 l = [0.15,0.25,0.40]
 dl = [2e-3,2e-3,2e-3]
 f = [[0.616,0.634,0.617,0.633],[0.616,0.665,0.617,0.664],[0.617,0.738,0.616,0.736]]
 df = [[6e-3,7e-3,3e-3,5e-3],[6e-3,7e-3,5e-3,6e-3],[6e-3,6e-3,7e-3,8e-3]]
+T = [1.62, 1.63, 1.62,1.63,1.63,1.63]
+
+# no coupling
+w = 2 * pi / mean_value(T)
+dw = 2 * pi * std_dev_m(T) / mean_value(T)**2
+
+print()
+print("no coupling;")
+print(val("w",w, dw))
 
 # weak coupling
 w1_w = 2 * pi * f[0][0]
