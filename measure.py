@@ -50,8 +50,11 @@ def signval(val, err=0.0):
   else:
     round2 = 0
     errstr = "{:.0e}".format(err)
-  expdiff = int(abs(m.floor(m.log10(abs(val))) - m.floor(m.log10(err))) + round2)
-  valstr = "{:.{digits}e}".format(val, digits = expdiff)
+  sdigits = int(m.floor(m.log10(abs(val))) - m.floor(m.log10(err)) + round2)
+  if (sdigits < 0):
+    sdigits = 0
+    errstr = "{:.0e}".format(err)
+  valstr = "{:.{digits}e}".format(val, digits=sdigits)
   return valstr + " ± " + errstr
 
 def val(name, val, err=0.0):
