@@ -106,8 +106,8 @@ print(sig("Deviation ", k_e_s, dk_e_s, k_t_s, dk_t_s))
 # proportionality between coupling and lengths
 l2 = [l[i]**2 for i in range(len(l))]
 dl2 = [2 * l[i] * dl[i] for i in range(len(l))]
-k = [k_e_w, k_e_m, k_e_s]
-dk = [dk_e_w, dk_e_m, dk_e_s]
+k = [k_t_w, k_t_m, k_t_s]
+dk = [dk_t_w, dk_t_m, dk_t_s]
 [g, dg, b, db, plt] = linreg(l2, k, dk, dl2, drawplot=True, xlabel="l^2 / m^2", ylabel="coupling constant k")
 plt.saveplot("linreg.pdf")
 
