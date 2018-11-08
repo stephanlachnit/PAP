@@ -1,4 +1,4 @@
-### measure Python 3 libraby version 1.3.1
+### measure Python 3 libraby version 1.4
 import math as m
 import matplotlib.pyplot as plt
 # todo: use numpy
@@ -10,7 +10,7 @@ linreg_change = 0.00001 # min relative change per step to end linear regression
 sqrt = m.sqrt
 exp = m.exp
 ln = m.log
-lg = m.log10
+log10 = m.log10
 sin = m.sin
 cos = m.cos
 tan = m.tan
@@ -105,7 +105,7 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
   return chi2(yo, dyo, ye, dye) / dof
 
 class plot:
-  def __init__(self, title="", xlabel="", ylabel="", figure=1):
+  def __init__(self, title="", xlabel="", ylabel="", figure=1, scale="linlin"):
     self.figure = plt.figure(figure)
     self.legend = False
     plt.clf()
@@ -113,7 +113,14 @@ class plot:
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
-    plt.ticklabel_format(style="sci", axis="both", scilimits=(-2,3))
+    if (scale == "linlin"):
+      plt.ticklabel_format(style="sci", axis="both", scilimits=(-2,3))
+    elif (scale == "linlog"):
+      plt.yscale("log")
+      plt.ticklabel_format(style="sci", axis="x", scilimits=(-2,3))
+    elif (scale == "loglog"):
+      plt.yscale("log")
+      plt.xscale("log")
 
   def plotdata(self, x, y, dy=[], dx=[], label=""):
     if (label != ""):
@@ -136,14 +143,11 @@ class plot:
     else:
       plt.close(self.figure)
 
-  def saveplot(self, filename, fileformat="pdf"):
-    plt.savefig(filename, format=fileformat)
-
   @staticmethod
   def showplots():
     plt.show()
 
-def linreg(x, y, dy, dx=[], drawplot=False, title="", xlabel="", ylabel="", figure=1):
+def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=plot()):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -173,17 +177,19 @@ def linreg(x, y, dy, dx=[], drawplot=False, title="", xlabel="", ylabel="", figu
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
   if (drawplot == True):
-    linregplot = plot(title=title, xlabel=xlabel, ylabel=ylabel, figure=figure)
     [g, dg, b, db] = result
     xn = len(x) - 1
     xint = [x[0] - dx[0], x[xn] + dx[xn]]
     yfit = [g * xint[i] + b for i in range(2)]
     yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
-    linregplot.plotdata(x, y, dy, dx)
-    linregplot.plotfunc(xint, yfit, label="line of best fit")
-    linregplot.plotfunc(xint, yerr, label="line of uncertainty")
-    linregplot.drawplot()
-    result.append(linregplot)
+    datalabel = prefix = ""
+    if (graphname != ""):
+      prefix = graphname + ": "
+      datalabel = prefix + "data points"
+    lrplot.plotdata(x, y, dy, dx, label=datalabel)
+    lrplot.plotfunc(xint, yfit, label=prefix+"line of best fit")
+    lrplot.plotfunc(xint, yerr, label=prefix+"line of uncertainty")
+    lrplot.drawplot()
   return result
 
 def lin_yerr(x, dx, y, dy):
