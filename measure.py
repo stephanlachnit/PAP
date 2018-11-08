@@ -162,6 +162,7 @@ def linreg(x, y, dy, dx=[], drawplot=False, title="", xlabel="", ylabel="", figu
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
+    dx = [0.0 for i in range(len(x))]
     result = iter0
   else:
     g = iter0[0]
