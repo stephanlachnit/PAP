@@ -125,4 +125,28 @@ print("proportionality:")
 print(val("slope", g, dg))
 print(val("y-itc", b, db))
 
+# ratios between k's and l^2's
+rk_wm = k_e_w / k_e_m
+drk_wm = 1 / k_e_m * sqrt(dk_e_w**2 + (k_e_w / k_e_m * dk_e_m)**2)
+rk_ws = k_e_w / k_e_s
+drk_ws = 1 / k_e_s * sqrt(dk_e_w**2 + (k_e_w / k_e_s * dk_e_s)**2)
+rk_ms = k_e_m / k_e_s
+drk_ms = 1 / k_e_s * sqrt(dk_e_m**2 + (k_e_m / k_e_s * dk_e_s)**2)
+l2_wm = l2[0] / l2[1]
+dl2_wm = 1 / l2[1] * sqrt(dl2[0]**2 + (l2[0] / l2[1] * dl2[1])**2)
+l2_ws = l2[0] / l2[2]
+dl2_ws = 1 / l2[2] * sqrt(dl2[0]**2 + (l2[0] / l2[2] * dl2[2])**2)
+l2_ms = l2[1] / l2[2]
+dl2_ms = 1 / l2[2] * sqrt(dl2[1]**2 + (l2[1] / l2[2] * dl2[2])**2)
+
+print(val("kw / km  ", rk_wm, drk_wm))
+print(val("l2w / l2m", l2_wm, dl2_wm))
+print(sig("deviation", rk_wm, drk_wm, l2_wm, dl2_wm))
+print(val("kw / ks  ", rk_ws, drk_ws))
+print(val("l2w / l2s", l2_ws, dl2_ws))
+print(sig("deviation", rk_ws, drk_ws, l2_ws, dl2_ws))
+print(val("km / ks  ", rk_ms, drk_ms))
+print(val("l2m / l2s", l2_ms, dl2_ms))
+print(sig("deviation", rk_ms, drk_ms, l2_ms, dl2_ms))
+
 plot.showplots()
