@@ -1,4 +1,4 @@
-### measure Python 3 libraby version 1.3
+### measure Python 3 libraby version 1.3.1
 import math as m
 import matplotlib.pyplot as plt
 # todo: use numpy
@@ -22,6 +22,7 @@ h = 6.626070040e-34 # Planck's constant
 dh = 8.1e-42 # Uncertanty of Planck's constant
 e = 1.6021766208e-19 # Elementary charge
 de = 9.8e-28 # Uncertanty of the elementary charge
+T0 = 273.15 # Zero Celsius in Kelvin
 
 def mean_value(x):
   s = 0.0
@@ -69,7 +70,7 @@ def lst(name, val, err=[]):
     err = [0.0 for i in range(len(val))]
   tmp = name + ":"
   for i in range(len(val)):
-    tmp +=  "\n" + signval(val[i], err[i])
+    tmp +=  "\n " + signval(val[i], err[i])
   return tmp
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):
