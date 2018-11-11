@@ -1,22 +1,21 @@
-### measure Python 3 libraby version 1.4
-import math as m
+### measure Python 3 libraby version 1.4.1
+import numpy as np
 import matplotlib.pyplot as plt
-# todo: use numpy
 
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
 
 # Variables for export
-sqrt = m.sqrt
-exp = m.exp
-ln = m.log
-log10 = m.log10
-sin = m.sin
-cos = m.cos
-tan = m.tan
-arctan = m.atan
-pi = m.pi
-euler_e = m.e
+sqrt = np.sqrt
+exp = np.exp
+ln = np.log
+log10 = np.log10
+sin = np.sin
+cos = np.cos
+tan = np.tan
+arctan = np.arctan
+pi = np.pi
+euler_e = np.e
 c = 2.99792458e8 # Speed of light
 h = 6.626070040e-34 # Planck's constant
 dh = 8.1e-42 # Uncertanty of Planck's constant
@@ -34,10 +33,10 @@ def std_dev_e(x):
   qs = 0.0
   for i in range(len(x)):
     qs += (x[i] - mean_value(x))**2
-  return m.sqrt(qs / (len(x) - 1))
+  return np.sqrt(qs / (len(x) - 1))
 
 def std_dev_m(x):
-  return std_dev_e(x) / m.sqrt(len(x))
+  return std_dev_e(x) / np.sqrt(len(x))
 
 def signval(val, err=0.0):
   if (err == 0.0):
@@ -51,7 +50,7 @@ def signval(val, err=0.0):
   else:
     round2 = 0
     errstr = "{:.0e}".format(err)
-  expdiff = int(m.floor(m.log10(abs(val))) - m.floor(m.log10(err)))
+  expdiff = int(np.floor(np.log10(abs(val))) - np.floor(np.log10(err)))
   if (expdiff < 0):
     sdigits = 0
     if (round2 != 1 or expdiff != -1):
@@ -75,7 +74,7 @@ def lst(name, val, err=[]):
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):
   nominator = abs(val1 - val2)
-  denominator = m.sqrt(dVal1**2 + dVal2**2)
+  denominator = np.sqrt(dVal1**2 + dVal2**2)
   if (nominator == 0.0):
     sigstr = "0"
   elif (denominator == 0.0):
@@ -83,7 +82,7 @@ def sig(name, val1, dVal1, val2, dVal2=0.0):
   else:
     sigma = nominator / denominator
     if (sigma < 0.95):
-      digits = int(abs(m.floor(m.log10(sigma))))
+      digits = int(abs(np.floor(np.log10(sigma))))
     elif (sigma < 3.95):
       digits = 1
     else:
@@ -105,7 +104,7 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
   return chi2(yo, dyo, ye, dye) / dof
 
 class plot:
-  def __init__(self, title="", xlabel="", ylabel="", figure=1, scale="linlin"):
+  def __init__(self, title="", xlabel="", ylabel="", figure=0, scale="linlin"):
     self.figure = plt.figure(figure)
     self.legend = False
     plt.clf()
@@ -147,7 +146,7 @@ class plot:
   def showplots():
     plt.show()
 
-def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=plot()):
+def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=None):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -158,9 +157,9 @@ def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=plot()):
       s4 += x[i] * y[i] / dy[i]**2
     eta = s0 * s3 - s1**2
     g = (s0 * s4 - s1 * s2) / eta
-    dg = m.sqrt(s0 / eta)
+    dg = np.sqrt(s0 / eta)
     b = (s3 * s2 - s1 * s4) / eta
-    db = m.sqrt(s3 / eta)
+    db = np.sqrt(s3 / eta)
     return [g, dg, b, db]
 
   iter0 = linreg_iter(x, y, dy)
@@ -173,13 +172,14 @@ def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=plot()):
     g_old = g * (1 - 2 * linreg_change)
     while (abs(1 - g_old / g) >= linreg_change):
       g_old = g
-      dy = [m.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
+      dy = [np.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
   if (drawplot == True):
     [g, dg, b, db] = result
-    xn = len(x) - 1
-    xint = [x[0] - dx[0], x[xn] + dx[xn]]
+    min_x = np.argmin(x)
+    max_x = np.argmax(x)
+    xint = [x[min_x] - dx[min_x], x[max_x] + dx[max_x]]
     yfit = [g * xint[i] + b for i in range(2)]
     yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
     datalabel = prefix = ""
@@ -189,10 +189,9 @@ def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=plot()):
     lrplot.plotdata(x, y, dy, dx, label=datalabel)
     lrplot.plotfunc(xint, yfit, label=prefix+"line of best fit")
     lrplot.plotfunc(xint, yerr, label=prefix+"line of uncertainty")
-    lrplot.drawplot()
   return result
 
 def lin_yerr(x, dx, y, dy):
   g = linreg(x, y, dx, dy)
-  new_dy = [m.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
+  new_dy = [np.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
   return new_dy
