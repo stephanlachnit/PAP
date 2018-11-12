@@ -1,9 +1,10 @@
-### measure Python 3 libraby version 1.4.1
+### measure Python 3 libraby version 1.4.2
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
+minfloat = 1e-80 # replaces zeros in linreg
 
 # Variables for export
 sqrt = np.sqrt
@@ -150,11 +151,13 @@ def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=None):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
-      s0 += 1 / dy[i]**2
-      s1 += x[i] / dy[i]**2
-      s2 += y[i] / dy[i]**2
-      s3 += x[i]**2 / dy[i]**2
-      s4 += x[i] * y[i] / dy[i]**2
+      if (dy[i] == 0.0):
+        dy[i] = minfloat
+      s0 += dy[i]**-2
+      s1 += x[i] * dy[i]**-2
+      s2 += y[i] * dy[i]**-2
+      s3 += x[i]**2 * dy[i]**-2
+      s4 += x[i] * y[i] * dy[i]**-2
     eta = s0 * s3 - s1**2
     g = (s0 * s4 - s1 * s2) / eta
     dg = np.sqrt(s0 / eta)
