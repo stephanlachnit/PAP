@@ -1,4 +1,4 @@
-# measure version 1.4.1
+# measure version 1.4.2
 from measure import sqrt,log10,pi,mean_value,std_dev_m,plot,linreg,val,lst,sig
 
 # measured values
@@ -17,8 +17,12 @@ d_s = [1362.5, 1357.5, 1377.5, 1377.5, 1377.5, 1377.5, 1377.5, 1377.5, 1392.5]
 dd_s = [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]
 d_f = 1147.6
 dd_f = 1.1
-R = 75e-3
-dR = 1e-3
+R_stokes = 75e-3
+dR_stokes = 1e-3
+R_hp = 1/2 * 1.5e-3
+dR_hp = 1/2 * 0.01e-3
+L_hp = 100e-3
+dL_hp = 0.5e-3
 g = 9.80984
 dg = 2e-5
 
@@ -27,69 +31,72 @@ N = len(t_stokes)
 t = [mean_value(t_stokes[i]) for i in range(N)]
 dt = [sqrt(std_dev_m(t_stokes[i])**2 + dt_systematic**2) for i in range(N)]
 
-v = [s_stokes[i] / t[i] for i in range(len(s_stokes))]
-dv = [s_stokes[i] / t[i]**2 * dt[i] for i in range(N)]
+v_stokes = [s_stokes[i] / t[i] for i in range(len(s_stokes))]
+dv_stokes = [s_stokes[i] / t[i]**2 * dt[i] for i in range(N)]
 
 r2 = [r[i]**2 for i in range(N)]
 dr2 = [2 * r[i] * dr[i] for i in range(N)]
-vdd = [v[i] / (d_s[i] - d_f) for i in range(N)]
-dvdd = [1 / (d_s[i] - d_f) * sqrt(dv[i]**2 + (v[i] / (d_s[i] - d_f))**2 * (dd_s[i]**2 + dd_f**2)) for i in range(N)]
+vdd = [v_stokes[i] / (d_s[i] - d_f) for i in range(N)]
+dvdd = [1 / (d_s[i] - d_f) * sqrt(dv_stokes[i]**2 + (v_stokes[i] / (d_s[i] - d_f))**2 * (dd_s[i]**2 + dd_f**2)) for i in range(N)]
 
-corr = [1 + 2.1 * r[i] / R for i in range(N)]
-dcorr = [2.1 * dr[i] / R for i in range(N)]
+corr = [1 + 2.1 * r[i] / R_stokes for i in range(N)]
+dcorr = [2.1 / R_stokes * sqrt(dr[i]**2 + (r[i] * dR_stokes / R_stokes)**2) for i in range(N)]
 vddcorr = [vdd[i] * corr[i] for i in range(N)]
 dvddcorr = [sqrt((dvdd[i] * corr[i])**2 + (vdd[i] * dcorr[i])**2) for i in range(N)]
 
-lrplot1 = plot(title="Comparison of the sphere's speeds with and without correction λ", xlabel="r^2 / m^2", ylabel="v/(ρs - ρf) / m^2*kg^-1*s^-1", figure=1)
+lrplot1 = plot(title="Comparison of the sphere's speeds with and without correction λ", xlabel="r^2 / m^2", ylabel="v/(ρs - ρf) / m^4*kg^-1*s^-1", figure=1)
 [tmp, tmp, tmp, tmp] = linreg(r2, vddcorr, dvddcorr, dr2, drawplot=True, graphname="w/ λ", lrplot=lrplot1)
 [tmp, tmp, tmp, tmp] = linreg(r2, vdd, dvdd, dr2, drawplot=True, graphname="w/o λ", lrplot=lrplot1)
 lrplot1.drawplot()
 
 r2_lr = [0.0, r2[8], r2[7], r2[6], r2[5], r2[4]]
-dr2_lr = [1e-8, dr2[8], dr2[7], dr2[6], dr2[5], dr2[4]]
+dr2_lr = [0.0, dr2[8], dr2[7], dr2[6], dr2[5], dr2[4]]
 vdd_lr = [0.0, vddcorr[8], vddcorr[7], vddcorr[6], vddcorr[5], vddcorr[4]]
-dvdd_lr = [1e-6, dvddcorr[8], dvddcorr[7], dvddcorr[6], dvddcorr[5], dvddcorr[4]]
-lrplot2 = plot(title="Linear regression of the slope", xlabel="r^2 / m^2", ylabel="v/(ρs - ρf) / m^2*kg^-1*s^-1", figure=2)
+dvdd_lr = [0.0, dvddcorr[8], dvddcorr[7], dvddcorr[6], dvddcorr[5], dvddcorr[4]]
+lrplot2 = plot(title="Linear regression of the slope", xlabel="r^2 / m^2", ylabel="v/(ρs - ρf) / m^4*kg^-1*s^-1", figure=2)
 [slope, dslope, tmp, tmp] = linreg(r2_lr, vdd_lr, dvdd_lr, dr2_lr, drawplot=True, lrplot=lrplot2)
 lrplot2.drawplot()
 
 n_stokes = 2 / 9 * g / slope
 dn_stokes = 2 / 9 / slope * sqrt(dg**2 + (g / slope * dslope)**2)
 
-Re = [d_f * v[i] * 2 * r[i] / n_stokes for i in range(N)]
-dRe = [2 / n_stokes * sqrt((r[i] * v[i] * dd_f)**2 + (r[i] * d_f * dv[i])**2 + (d_f * v[i] * dr[i])**2 + (r[i] * d_f * v[i] / n_stokes * dn_stokes)**2) for i in range(N)]
+Re_stokes = [d_f * v_stokes[i] * 2 * r[i] / n_stokes for i in range(N)]
+dRe_stokes = [2 / n_stokes * sqrt((r[i] * v_stokes[i] * dd_f)**2 + (r[i] * d_f * dv_stokes[i])**2 + (d_f * v_stokes[i] * dr[i])**2 + (r[i] * d_f * v_stokes[i] / n_stokes * dn_stokes)**2) for i in range(N)]
 
 vlam = [2 / 9 * g * (d_s[i] - d_f) / n_stokes * r2[i] for i in range(N)]
-dvlam = [2 / 9 / n_stokes * sqrt((g * r2[i])**2 * (dd_s[i]**2 + dd_f**2 + ((dd_s[i] - dd_f) / n_stokes * dn_stokes)**2) + (r2[i] * (d_s[i] - d_f) * dg)**2 + (g * (dd_s[i] - dd_f) * dr[i])**2) for i in range(N)]
+dvlam = [2 / 9 / n_stokes * sqrt((g * r2[i])**2 * (dd_s[i]**2 + dd_f**2 + ((dd_s[i] - dd_f) / n_stokes * dn_stokes)**2) + (r2[i] * (d_s[i] - d_f) * dg)**2 + (g * (dd_s[i] - dd_f) * dr2[i])**2) for i in range(N)]
 
-vdvlam = [v[i] / vlam[i] for i in range(N)]
-dvdlam = [1 / vlam[i] * sqrt(dv[i]**2 + (v[i] / vlam[i] * dvlam[i]**2)) for i in range(N)]
+vdvlam = [v_stokes[i] / vlam[i] for i in range(N)]
+dvdlam = [1 / vlam[i] * sqrt(dv_stokes[i]**2 + (v_stokes[i] / vlam[i] * dvlam[i])**2) for i in range(N)]
 
 lamplt = plot(xlabel="v / vlam", ylabel="Re", figure=3, scale="linlog")
-lamplt.plotdata(vdvlam, Re, dRe, dvdlam)
+lamplt.plotdata(vdvlam, Re_stokes, dRe_stokes, dvdlam)
 lamplt.drawplot()
 
 print()
 print("viscosity with stokes:")
 print()
+print(lst("r", r, dr))
+print()
 print(lst("r2", r2, dr2))
 print()
-print(lst("speed w/o λ", v, dv))
+print(lst("v w/o λ", v_stokes, dv_stokes))
 print()
-print(lst("speed/Roh", vdd, dvdd))
+print(lst("v/roh w/o λ", vdd, dvdd))
 print()
-print(lst("speed/Roh w/ λ", vddcorr, dvddcorr))
+print(lst("v/roh w/ λ", vddcorr, dvddcorr))
 print()
-print(lst("Re", Re, dRe))
+print(val("slope", slope, dslope))
 print()
 print(val("viscosity", n_stokes, dn_stokes))
+print()
+print(lst("Re", Re_stokes, dRe_stokes))
+print()
+print(lst("vlam", vlam, dvlam))
+print()
+print(lst("v/vlam", vdvlam, dvdlam))
 
 # viscosity with hagen-poiseuille
-R = 1/2 * 1.5e-3
-dR = 1/2 * 0.01e-3
-L = 100e-3
-dL = 0.5e-3
-
 h = mean_value([hA, hE])
 dh = sqrt(dhA**2 + dhE**2)
 p = h * d_f * g
@@ -102,20 +109,20 @@ hgplot.drawplot()
 Vdt = 1 / tdV
 dVdt = dtdV / tdV**2
 
-n_hp = pi / 8 * p * R**4 * tdV / L
-dn_hp = pi / 8 * R**3 / L * sqrt((p * 4 * dR *tdV)**2 + (dp * R * tdV)**2 + (p * R * dtdV)**2 + (p * R * tdV / L * dL)**2)
+n_hp = pi / 8 * p * R_hp**4 * tdV / L_hp
+dn_hp = pi / 8 * R_hp**3 / L_hp * sqrt((p * 4 * dR_hp *tdV)**2 + (dp * R_hp * tdV)**2 + (p * R_hp * dtdV)**2 + (p * R_hp * tdV / L_hp * dL_hp)**2)
 
-v = p * R**2 / (6 * n_hp * h)
-dv = R / (6 * n_hp * h) * sqrt((R * dp)**2 + (R * p * dn_hp / n_hp)**2 + (R * p * dh / h)**2 + (2 * p * dR)**2)
-Re = d_f * v * 2 * R / n_hp
-dRe = 2 / n_hp * sqrt((R * dd_f * v)**2 + (R * d_f * dv)**2 + (R * d_f * v * dn_hp / n_hp**2)**2 + (dR * d_f * v)**2)
+v_stokes = p * R_hp**2 / (6 * n_hp * h)
+dv_hp = R_hp / (6 * n_hp * h) * sqrt((R_hp * dp)**2 + (R_hp * p * dn_hp / n_hp)**2 + (R_hp * p * dh / h)**2 + (2 * p * dR_hp)**2)
+Re_hp = d_f * v_stokes * 2 * R_hp / n_hp
+dRe_hp = 2 / n_hp * sqrt((R_hp * dd_f * v_stokes)**2 + (R_hp * d_f * dv_hp)**2 + (R_hp * d_f * v_stokes * dn_hp / n_hp)**2 + (dR_hp * d_f * v_stokes)**2)
 
 print()
 print("viscosity with hagen-poiseuille:")
 print()
 print(val("Volume flow speed", Vdt, dVdt))
-print(val("Vertical flow speed", v, dv))
-print(val("Reynold", Re, dRe))
+print(val("Vertical flow speed", v_stokes, dv_hp))
+print(val("Reynold", Re_hp, dRe_hp))
 print(val("viscosity", n_hp, dn_hp))
 
 # Comparison
