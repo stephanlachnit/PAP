@@ -129,6 +129,9 @@ class plot:
     elif (scale == "linlog"):
       plt.yscale("log")
       plt.ticklabel_format(style="sci", axis="x", scilimits=(-2,3))
+    elif (scale == "loglin"):
+      plt.xscale("log")
+      plt.ticklabel_format(style="sci", axis="y", scilimits=(-2,3))
     elif (scale == "loglog"):
       plt.yscale("log")
       plt.xscale("log")
