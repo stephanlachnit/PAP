@@ -87,7 +87,7 @@ if (bplotdata == True):
 
 # Plot functions
 bplotfunc = False
-if (bplotdata == True):
+if (bplotfunc == True):
   print()
   print("Plot functions")
   from measure import plot,showfigs
