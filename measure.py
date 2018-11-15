@@ -1,4 +1,4 @@
-### measure Python 3 libraby version 1.4.2
+### measure Python 3 libraby version 1.5
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -23,6 +23,8 @@ dh = 8.1e-42 # Uncertanty of Planck's constant
 e = 1.6021766208e-19 # Elementary charge
 de = 9.8e-28 # Uncertanty of the elementary charge
 T0 = 273.15 # Zero Celsius in Kelvin
+g = 9.80984 # Gravitantional Acceleration in Heidelberg 
+dg = 2e-5 # Uncertanty of the gravitational Acceleration
 
 def mean_value(x):
   s = 0.0
@@ -104,10 +106,19 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
     dof = len(ye)
   return chi2(yo, dyo, ye, dye) / dof
 
+def showfigs():
+  plt.show()
+
+class table:
+  def __init__(self, data, rowLbls, colLbls, title="", fig=0):
+    self.figure = plt.figure(fig)
+    plt.clf()
+    plt.axis("off")
+    plt.table(cellText=data, rowLabels=rowLbls, colLabels=colLbls, loc="center")
+
 class plot:
-  def __init__(self, title="", xlabel="", ylabel="", figure=0, scale="linlin"):
-    self.figure = plt.figure(figure)
-    self.legend = False
+  def __init__(self, title="", xlabel="", ylabel="", fig=0, scale="linlin"):
+    self.figure = plt.figure(fig)
     plt.clf()
     plt.title(title)
     plt.xlabel(xlabel)
@@ -123,31 +134,20 @@ class plot:
       plt.xscale("log")
 
   def plotdata(self, x, y, dy=[], dx=[], label=""):
-    if (label != ""):
-      self.legend = True
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
       dy = [0.0 for i in range(len(y))]
     plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=3)
+    if (label != ""):
+      plt.legend()
   
   def plotfunc(self, x, y, label=""):
-    if (label != ""):
-      self.legend = True
     plt.plot(x, y, label=label)
+    if (label != ""):
+      plt.legend()
 
-  def drawplot(self, show=True):
-    if (show == True):
-      if (self.legend == True):
-        plt.legend()
-    else:
-      plt.close(self.figure)
-
-  @staticmethod
-  def showplots():
-    plt.show()
-
-def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=None):
+def linreg(x, y, dy, dx=[], lrplot=None, graphname=""):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -178,7 +178,7 @@ def linreg(x, y, dy, dx=[], drawplot=False, graphname="", lrplot=None):
       dy = [np.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
-  if (drawplot == True):
+  if (lrplot != None):
     [g, dg, b, db] = result
     min_x = np.argmin(x)
     max_x = np.argmax(x)

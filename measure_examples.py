@@ -1,11 +1,11 @@
-# measure version 1.3
+# measure version 1.5
 
 # Significant values
 bval = False
 if (bval == True):
-  from measure import val
   print()
   print("Significant values")
+  from measure import val
   x0 = 3.357789123e4
   print(val("no error", x0))
   x1 = 760.0e-9
@@ -18,10 +18,9 @@ if (bval == True):
 # Statistical evaluation
 bstat = False
 if (bstat == True):
-  from measure import val
   print()
   print("Statistical evaluation")
-  from measure import mean_value,std_dev_e,std_dev_m
+  from measure import val,mean_value,std_dev_e,std_dev_m,chi2, chi2_red
   x = [2.33, 2.37, 2.21, 2.32, 2.17, 2.44, 2.11]
   x0 = x[2]
   xm = mean_value(x)
@@ -29,7 +28,6 @@ if (bstat == True):
   dxm = std_dev_m(x)
   print(val("Mean value", xm, dxm))
   print(val("Some value", x0, dx))
-  from measure import chi2, chi2_red
   xobserved = [1.1, 1.9, 3.2, 3.8, 5.2]
   dxo = [0.1, 0.3, 0.2, 0.2, 0.3]
   xexpected = [1.0, 2.0, 3.0, 4.0, 5.0]
@@ -45,9 +43,9 @@ if (bstat == True):
 # Deviation between values
 bsig = False
 if (bsig == True):
-  from measure import sig
   print()
   print("Deviation between values")
+  from measure import sig
   x1 = 3.4
   d1 = 0.1
   x2 = 3.404
@@ -61,54 +59,50 @@ if (bsig == True):
 # Constants
 bconstants = False
 if (bconstants == True):
-  from measure import val
   print()
   print("Constants")
-  from measure import pi
+  from measure import val,pi,euler_e as e
   print(val("Pi", pi))
-  from measure import euler_e as e
   print(val("e", e))
-  from measure import c
+  from measure import c,e,de,h,dh,T0,g,dg
   print(val("Speed of light", c))
-  from measure import e,de
   print(val("Elementary charge", e, de))
-  from measure import h,dh
   print(val("Plancl's constant", h, dh))
+  print(val("Zero Celsiuis in Kelvin", T0))
+  print(val("Gravitational acceleration in Heidelberg", g, dg))
 
 # Plot data
 bplotdata = False
 if (bplotdata == True):
-  from measure import plot
   print()
   print("Plot data")
+  from measure import plot,showfigs
   x = [1, 2, 3]
   dx = [0.1, 0.2, 0.3]
   y = [8, 2, 1]
   dy = [2, 1, 0.5]
-  dataplot = plot(title="data plot", xlabel="x", ylabel="y", figure=1)
+  dataplot = plot(title="data plot", xlabel="x", ylabel="y", fig=1)
   dataplot.plotdata(x, y, dy, dx, label="samples")
-  dataplot.drawplot()
-  plot.showplots()
+  showfigs()
 
 # Plot functions
 bplotfunc = False
 if (bplotdata == True):
-  from measure import plot
   print()
   print("Plot functions")
+  from measure import plot,showfigs
   x = [0.1 * i for i in range(100)]
   y = [i**2 for i in range(100)]
-  funcplot = plot(title="function plot", xlabel="x", ylabel="y", figure=1)
+  funcplot = plot(title="function plot", xlabel="x", ylabel="y", fig=2)
   funcplot.plotfunc(x, y, label="f(x)=x^2")
-  funcplot.drawplot()
-  plot.showplots()
+  showfigs()
 
 # Linear regression w/o plot
 blinreg = False
 if (blinreg == True):
-  from measure import linreg,val
   print()
   print("Linear regression w/o plot")
+  from measure import linreg,val
   n = 10
   x = [i for i in range(n)]
   dx = [0.1 for i in range(n)]
@@ -121,13 +115,26 @@ if (blinreg == True):
 # Linear regression w/ plot
 blinregplot = False
 if (blinregplot == True):
-  from measure import linreg,plot
   print()
   print("Linear regression w/ plot")
+  from measure import linreg,plot,showfigs
   n = 10
   x = [i for i in range(n)]
   dx = [0.1 for i in range(n)]
   y = [2 + i**0.9 for i in range(n)]
   dy = [0.5 for i in range(n)]
-  [g, dg, b, db, linregplot] = linreg(x, y, dy, dx, drawplot=True, title="Linear regression")
-  plot.showplots()
+  lrplot = plot(title="Linear regression", xlabel="x", ylabel="y", fig=3)
+  [g, dg, b, db, linregplot] = linreg(x, y, dy, dx, lrplot=lrplot)
+  showfigs()
+
+# Tables
+btable = False
+if (btable == True):
+  print()
+  print("Tables")
+  from measure import table,showfigs
+  data = [[1,2,3],[2,4,6],[4,8,12]]
+  rowLbls = ["1x","2x","3x"]
+  colLbls = ["n=1","n=2","n=3"]
+  tbl = table(data, rowLbls, colLbls, title="Title", fig=4)
+  showfigs()
