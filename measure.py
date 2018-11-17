@@ -1,4 +1,4 @@
-### measure Python 3 libraby version 1.5
+### measure libraby version 1.5.1
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -135,6 +135,8 @@ class plot:
     elif (scale == "loglog"):
       plt.yscale("log")
       plt.xscale("log")
+
+  plt = plt
 
   def plotdata(self, x, y, dy=[], dx=[], label=""):
     if (dx == []):
