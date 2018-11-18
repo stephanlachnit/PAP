@@ -1,4 +1,4 @@
-### measure libraby version 1.5.1
+### measure libraby version 1.5.2
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -43,16 +43,16 @@ def std_dev_m(x):
 
 def signval(val, err=0.0):
   if (err == 0.0):
-    return "{:g}".format(val)
-  if ("{:.1e}".format(err)[0] == "9" and "{:.0e}".format(err)[0] == "1"):
-    err = float("{:.0e}".format(err))
-  firstdigit = int("{:.1e}".format(err)[0])
+    return '{:g}'.format(val)
+  if ('{:.1e}'.format(err)[0] == '9' and '{:.0e}'.format(err)[0] == '1'):
+    err = float('{:.0e}'.format(err))
+  firstdigit = int('{:.1e}'.format(err)[0])
   if (firstdigit <= 2):
     round2 = 1
-    errstr = "{:.1e}".format(err)
+    errstr = '{:.1e}'.format(err)
   else:
     round2 = 0
-    errstr = "{:.0e}".format(err)
+    errstr = '{:.0e}'.format(err)
   expdiff = int(np.floor(np.log10(abs(val))) - np.floor(np.log10(err)))
   if (expdiff < 0):
     sdigits = 0
@@ -60,28 +60,28 @@ def signval(val, err=0.0):
       val = 0.0
   else:
     sdigits = expdiff + round2
-  valstr = "{:.{digits}e}".format(val, digits=sdigits)
-  return valstr + " ± " + errstr
+  valstr = '{:.{digits}e}'.format(val, digits=sdigits)
+  return valstr + ' ± ' + errstr
 
 def val(name, val, err=0.0):
-  return name + ": " + signval(val, err)
+  return name + ': ' + signval(val, err)
 
 def lst(name, val, err=[]):
   # todo: format data to make values align nicely, needs modifying of signval
   if (err == []):
     err = [0.0 for i in range(len(val))]
-  tmp = name + ":"
+  tmp = name + ':'
   for i in range(len(val)):
-    tmp +=  "\n " + signval(val[i], err[i])
+    tmp +=  '\n ' + signval(val[i], err[i])
   return tmp
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):
   nominator = abs(val1 - val2)
   denominator = np.sqrt(dVal1**2 + dVal2**2)
   if (nominator == 0.0):
-    sigstr = "0"
+    sigstr = '0'
   elif (denominator == 0.0):
-    sigstr = "∞"
+    sigstr = '∞'
   else:
     sigma = nominator / denominator
     if (sigma < 0.95):
@@ -90,8 +90,8 @@ def sig(name, val1, dVal1, val2, dVal2=0.0):
       digits = 1
     else:
       digits = 0
-    sigstr = "{:.{digits}f}".format(sigma, digits = digits)
-  return name + ": " + sigstr + "σ"
+    sigstr = '{:.{digits}f}'.format(sigma, digits = digits)
+  return name + ': ' + sigstr + 'σ'
 
 def chi2(yo, dyo, ye, dye=[]):
   if (dye == []):
@@ -110,49 +110,49 @@ def showfigs():
   plt.show()
 
 class table:
-  def __init__(self, data, rowLbls, colLbls, title="", fig=0):
+  def __init__(self, data, rowLbls, colLbls, title='', fig=0):
     self.figure = plt.figure(fig)
     plt.clf()
-    plt.axis("off")
-    plt.table(cellText=data, rowLabels=rowLbls, colLabels=colLbls, loc="center")
+    plt.axis('off')
+    plt.table(cellText=data, rowLabels=rowLbls, colLabels=colLbls, loc='center')
 
 class plot:
-  def __init__(self, title="", xlabel="", ylabel="", fig=0, scale="linlin"):
+  def __init__(self, title='', xlabel='', ylabel='', fig=0, scale='linlin'):
     self.figure = plt.figure(fig)
     plt.clf()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
-    if (scale == "linlin"):
-      plt.ticklabel_format(style="sci", axis="both", scilimits=(-2,3))
-    elif (scale == "linlog"):
-      plt.yscale("log")
-      plt.ticklabel_format(style="sci", axis="x", scilimits=(-2,3))
-    elif (scale == "loglin"):
-      plt.xscale("log")
-      plt.ticklabel_format(style="sci", axis="y", scilimits=(-2,3))
-    elif (scale == "loglog"):
-      plt.yscale("log")
-      plt.xscale("log")
+    if (scale == 'linlin'):
+      plt.ticklabel_format(style='sci', axis='both', scilimits=(-2,3))
+    elif (scale == 'linlog'):
+      plt.yscale('log')
+      plt.ticklabel_format(style='sci', axis='x', scilimits=(-2,3))
+    elif (scale == 'loglin'):
+      plt.xscale('log')
+      plt.ticklabel_format(style='sci', axis='y', scilimits=(-2,3))
+    elif (scale == 'loglog'):
+      plt.yscale('log')
+      plt.xscale('log')
 
   plt = plt
 
-  def plotdata(self, x, y, dy=[], dx=[], label=""):
+  def plotdata(self, x, y, dy=[], dx=[], label='', color=None):
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
       dy = [0.0 for i in range(len(y))]
-    plt.errorbar(x, y, dy, dx, label=label, fmt='o', markersize=3)
-    if (label != ""):
+    plt.errorbar(x, y, dy, dx, label=label, color=color, fmt='o', markersize=3)
+    if (label != ''):
       plt.legend()
   
-  def plotfunc(self, x, y, label=""):
-    plt.plot(x, y, label=label)
-    if (label != ""):
+  def plotfunc(self, x, y, label=''):
+    plt.plot(x, y, label=label, marker='')
+    if (label != ''):
       plt.legend()
 
-def linreg(x, y, dy, dx=[], lrplot=None, graphname=""):
+def linreg(x, y, dy, dx=[], lrplot=None, graphname=''):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -190,13 +190,14 @@ def linreg(x, y, dy, dx=[], lrplot=None, graphname=""):
     xint = [x[min_x] - dx[min_x], x[max_x] + dx[max_x]]
     yfit = [g * xint[i] + b for i in range(2)]
     yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
-    datalabel = prefix = ""
-    if (graphname != ""):
-      prefix = graphname + ": "
-      datalabel = prefix + "data points"
-    lrplot.plotdata(x, y, dy, dx, label=datalabel)
-    lrplot.plotfunc(xint, yfit, label=prefix+"line of best fit")
-    lrplot.plotfunc(xint, yerr, label=prefix+"line of uncertainty")
+    datalabel = prefix = ''
+    if (graphname != ''):
+      prefix = graphname + ': '
+      datalabel = prefix + 'data points'
+    fitfunc = plt.plot(xint, yfit, label=prefix+'line of best fit', marker='')
+    color = fitfunc[0].get_color()
+    plt.plot(xint, yerr, label=prefix+'line of uncertainty', marker='', linestyle='dashed', color=color)
+    lrplot.plotdata(x, y, dy, dx, label=datalabel, color=color)
   return result
 
 def lin_yerr(x, dx, y, dy):
