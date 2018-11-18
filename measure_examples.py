@@ -1,4 +1,4 @@
-# measure version 1.6
+# measure version 1.6.2
 
 # Significant values
 bval = False
@@ -21,7 +21,7 @@ if (btable == True):
   print()
   print('Tables')
   from measure import tbl
-  data = [ [1,2,3], [2,4,6] ]
+  data = [[10,2e-100,3], [2,40,600]]
   names = ['a', 'b']
   print(tbl(names, data))
 

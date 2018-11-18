@@ -1,4 +1,4 @@
-### measure libraby version 1.6.1
+### measure libraby version 1.6.2
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -152,6 +152,7 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
   return chi2(yo, dyo, ye, dye) / dof
 
 class plot:
+  # todo: plot shouldn't replace plt, more like expand it with usefull presets
   def __init__(self, title='', xlabel='', ylabel='', fig=0, scale='linlin'):
     self.figure = plt.figure(fig)
     plt.clf()
@@ -184,6 +185,8 @@ class plot:
     plt.plot(x, y, label=label, marker='')
     if (label != ''):
       plt.legend()
+
+  figure = None
 
   plt = plt
 
@@ -237,6 +240,7 @@ def linreg(x, y, dy, dx=[], lrplot=None, graphname=''):
     color = fitfunc[0].get_color()
     plt.plot(xint, yerr, label=prefix+'line of uncertainty', marker='', linestyle='dashed', color=color)
     lrplot.plotdata(x, y, dy, dx, label=datalabel, color=color)
+    plt.legend()
   return result
 
 def lin_yerr(x, dx, y, dy):
