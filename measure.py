@@ -1,4 +1,4 @@
-### measure libraby version 1.6
+### measure libraby version 1.6.1
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -105,9 +105,15 @@ def tbl(names, vals, errs=[]):
   for i in range(len(names)):
     tmp.append(lst(names[i], vals[i], errs[i]))
   tmp = [tmp[i].split('\n') for i in range(len(tmp))]
-  for i in range(len(tmp)):
-    for j in range(len(tmp[i])):
-      out += tmp[i][j]
+  lens = [len(tmp[i][1]) for i in range(len(tmp))]
+  for i in range(len(tmp[0])):
+    for j in range(len(tmp)):
+      if (i == 0):
+        out += (' ' + tmp[j][i]).ljust(lens[j])
+      else:
+        out += tmp[j][i]
+      if (j != len(tmp) - 1 ):
+        out += ' |'
     out += '\n'
   return out
 
