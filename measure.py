@@ -1,4 +1,4 @@
-### measure libraby version 1.5.2
+### measure libraby version 1.5.3
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -43,7 +43,7 @@ def std_dev_m(x):
 
 def signval(val, err=0.0):
   if (err == 0.0):
-    return '{:g}'.format(val)
+    return ['{:g}'.format(val), '']
   if ('{:.1e}'.format(err)[0] == '9' and '{:.0e}'.format(err)[0] == '1'):
     err = float('{:.0e}'.format(err))
   firstdigit = int('{:.1e}'.format(err)[0])
@@ -61,19 +61,37 @@ def signval(val, err=0.0):
   else:
     sdigits = expdiff + round2
   valstr = '{:.{digits}e}'.format(val, digits=sdigits)
-  return valstr + ' ± ' + errstr
+  return [valstr, errstr]
 
 def val(name, val, err=0.0):
-  return name + ': ' + signval(val, err)
+  prefix = ''
+  if (name != ''):
+    prefix = name + ': '
+  tmp = signval(val, err)
+  out = prefix + tmp[0]
+  if (tmp[1] != ''):
+    out += ' ± ' + tmp[1]
+  return out
 
 def lst(name, val, err=[]):
-  # todo: format data to make values align nicely, needs modifying of signval
   if (err == []):
     err = [0.0 for i in range(len(val))]
-  tmp = name + ':'
+  N = len(val)
+  valmaxlen = 0
+  errmaxlen = 0
+  for i in range(N):
+    tmp = signval(val[i], err[i])
+    if (len(tmp[0]) > valmaxlen):
+      valmaxlen = len(tmp[0])
+    if (len(tmp[1]) > errmaxlen):
+      errmaxlen = len(tmp[1])
+  out = name + ':'
   for i in range(len(val)):
-    tmp +=  '\n ' + signval(val[i], err[i])
-  return tmp
+    tmp = signval(val[i], err[i])
+    out +=  '\n ' + tmp[0].ljust(valmaxlen)
+    if (tmp[1] != ''):
+      out += ' ± ' + tmp[1].ljust(errmaxlen)
+  return out
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):
   nominator = abs(val1 - val2)
@@ -91,7 +109,10 @@ def sig(name, val1, dVal1, val2, dVal2=0.0):
     else:
       digits = 0
     sigstr = '{:.{digits}f}'.format(sigma, digits = digits)
-  return name + ': ' + sigstr + 'σ'
+  prefix = ''
+  if (name != ''):
+    prefix = name + ': '
+  return prefix + sigstr + 'σ'
 
 def chi2(yo, dyo, ye, dye=[]):
   if (dye == []):
@@ -110,6 +131,7 @@ def showfigs():
   plt.show()
 
 class table:
+  # todo: output to console instead to matplotlib figure, using new signval 
   def __init__(self, data, rowLbls, colLbls, title='', fig=0):
     self.figure = plt.figure(fig)
     plt.clf()
