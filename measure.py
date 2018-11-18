@@ -1,4 +1,4 @@
-### measure libraby version 1.5.3
+### measure libraby version 1.6
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -64,11 +64,11 @@ def signval(val, err=0.0):
   return [valstr, errstr]
 
 def val(name, val, err=0.0):
-  prefix = ''
+  out = ''
   if (name != ''):
-    prefix = name + ': '
+    out += name + ': '
   tmp = signval(val, err)
-  out = prefix + tmp[0]
+  out += tmp[0]
   if (tmp[1] != ''):
     out += ' ± ' + tmp[1]
   return out
@@ -85,12 +85,30 @@ def lst(name, val, err=[]):
       valmaxlen = len(tmp[0])
     if (len(tmp[1]) > errmaxlen):
       errmaxlen = len(tmp[1])
-  out = name + ':'
+  out = ''
+  if (name != ''):
+    out += name + ':'
   for i in range(len(val)):
     tmp = signval(val[i], err[i])
     out +=  '\n ' + tmp[0].ljust(valmaxlen)
     if (tmp[1] != ''):
       out += ' ± ' + tmp[1].ljust(errmaxlen)
+    elif (errmaxlen != 0):
+      out += ''.ljust(errmaxlen + 3)
+  return out
+
+def tbl(names, vals, errs=[]):
+  out = ''
+  if (errs == []):
+    errs = [[] for i in range(len(vals))]
+  tmp = []
+  for i in range(len(names)):
+    tmp.append(lst(names[i], vals[i], errs[i]))
+  tmp = [tmp[i].split('\n') for i in range(len(tmp))]
+  for i in range(len(tmp)):
+    for j in range(len(tmp[i])):
+      out += tmp[i][j]
+    out += '\n'
   return out
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):
@@ -127,17 +145,6 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
     dof = len(ye)
   return chi2(yo, dyo, ye, dye) / dof
 
-def showfigs():
-  plt.show()
-
-class table:
-  # todo: output to console instead to matplotlib figure, using new signval 
-  def __init__(self, data, rowLbls, colLbls, title='', fig=0):
-    self.figure = plt.figure(fig)
-    plt.clf()
-    plt.axis('off')
-    plt.table(cellText=data, rowLabels=rowLbls, colLabels=colLbls, loc='center')
-
 class plot:
   def __init__(self, title='', xlabel='', ylabel='', fig=0, scale='linlin'):
     self.figure = plt.figure(fig)
@@ -158,8 +165,6 @@ class plot:
       plt.yscale('log')
       plt.xscale('log')
 
-  plt = plt
-
   def plotdata(self, x, y, dy=[], dx=[], label='', color=None):
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
@@ -173,6 +178,12 @@ class plot:
     plt.plot(x, y, label=label, marker='')
     if (label != ''):
       plt.legend()
+
+  plt = plt
+
+  @staticmethod
+  def showfigs():
+    plt.show()
 
 def linreg(x, y, dy, dx=[], lrplot=None, graphname=''):
   def linreg_iter(x, y, dy):
