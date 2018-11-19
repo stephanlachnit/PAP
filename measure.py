@@ -1,4 +1,4 @@
-### measure libraby version 1.6.2
+### measure libraby version 1.6.3
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,10 +18,10 @@ arctan = np.arctan
 pi = np.pi
 euler_e = np.e
 c = 2.99792458e8 # Speed of light
-h = 6.626070040e-34 # Planck's constant
-dh = 8.1e-42 # Uncertanty of Planck's constant
-e = 1.6021766208e-19 # Elementary charge
-de = 9.8e-28 # Uncertanty of the elementary charge
+h = 6.62607015e-34 # Planck's constant
+e = 1.602176634e-19 # Elementary charge
+kB = 1.380649e-23 # Boltzmann constant
+NA = 6.02214076e23 # Avogadro constant
 T0 = 273.15 # Zero Celsius in Kelvin
 g = 9.80984 # Gravitantional Acceleration in Heidelberg 
 dg = 2e-5 # Uncertanty of the gravitational Acceleration
@@ -55,7 +55,7 @@ def signval(val, err=0.0):
     errstr = '{:.0e}'.format(err)
   expdiff = int(np.floor(np.log10(abs(val))) - np.floor(np.log10(err)))
   if (expdiff < 0):
-    sdigits = 0
+    sdigits = 0 #bug: try val('',0.999,1.1) and val('',1.0,1.1)
     if (round2 != 1 or expdiff != -1):
       val = 0.0
   else:
@@ -114,7 +114,8 @@ def tbl(names, vals, errs=[]):
         out += tmp[j][i]
       if (j != len(tmp) - 1 ):
         out += ' |'
-    out += '\n'
+    if (i != len(tmp[0]) - 1):
+      out += '\n'
   return out
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):

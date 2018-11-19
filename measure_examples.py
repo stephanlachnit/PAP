@@ -1,4 +1,4 @@
-# measure version 1.6.2
+# measure version 1.6.3
 
 # Significant values
 bval = False
@@ -74,10 +74,12 @@ if (bconstants == True):
   from measure import val,pi,euler_e as e
   print(val('Pi', pi))
   print(val('e', e))
-  from measure import c,e,de,h,dh,T0,g,dg
+  from measure import c,e,h,kB,NA,T0,g,dg
   print(val('Speed of light', c))
-  print(val('Elementary charge', e, de))
-  print(val('Planck\'s constant', h, dh))
+  print(val('Elementary charge', e))
+  print(val('Planck\'s constant', h))
+  print(val('Boltzmann constant', kB))
+  print(val('Avogadro constant', NA))
   print(val('Zero Celsiuis in Kelvin', T0))
   print(val('Gravitational acceleration in Heidelberg', g, dg))
 
