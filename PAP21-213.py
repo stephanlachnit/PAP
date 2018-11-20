@@ -1,5 +1,5 @@
-# measure version: 1.6.2
-from measure import np,pi,g,dg,ln,exp,sqrt,val,lst,tbl,sig,mean_value,linreg,plot
+# measure version: 1.7
+from measure import np,pi,g,dg,ln,exp,sqrt,val,lst,tbl,sig,mv,dsto_mv,dsys_mv,dtot,linreg,plot
 
 # values
 m_k = 4.164
@@ -77,12 +77,10 @@ dIz_2x20 = m_s * 0.15 / (2.*pi)**2 * sqrt((g * dslope_2x20)**2 + (dg * slope_2x2
 
 Iz_list = np.array([Iz_1x15, Iz_1x20, Iz_2x15, Iz_2x20])
 dIz_list = np.array([dIz_1x15, dIz_1x20, dIz_2x15, dIz_2x20])
-Iz = mean_value(Iz_list)
-tmp = Iz_list + dIz_list
-maxval = tmp[np.argmax(tmp)]
-tmp = Iz_list - dIz_list
-minval = tmp[np.argmin(tmp)]
-dIz = 1 / 2 * (maxval + minval) # maybe wrong
+Iz = mv(Iz_list)
+Iz_dsto = dsto_mv(Iz_list)
+Iz_dsys = dsys_mv(dIz_list)
+Iz_dtot = dtot(Iz_dsto, Iz_dsys)
 
 tblstr = ['1@15','1@20','2@15','2@20']
 
@@ -100,7 +98,7 @@ print(sig('0-yitc 2@20', yitc_2x20, dyitc_2x20, 0.0))
 print()
 print(lst('Moment of anertia Iz', [Iz_1x15, Iz_1x20, Iz_2x15, Iz_2x20], [dIz_1x15, dIz_1x20, dIz_2x15, dIz_2x20]))
 print()
-print(val('Iz (mean value)', Iz, dIz))
+print(val('Iz (mean value)', Iz, Iz_dtot))
 
 # color frequency
 Omega = 2.*pi * 10. / cf_10u
@@ -108,16 +106,16 @@ dOmega = 2.*pi * 10. * cf_d10u / cf_10u**2
 wf = 2.*pi * cf_f
 dwf = 2.*pi * cf_df
 
-cfplot = plot(title='angular color speed Ω as function of the angular rotation speed ωf', xlabel='ωf / rad/s', ylabel='Ω / rad/s', fig=4)
+cfplot = plot(title=r'angular color speed Ω as function of the angular rotation speed $ω_f$', xlabel='ωf / rad/s', ylabel='Ω / rad/s', fig=4)
 [slope, dslope, yitc, dyitc] = linreg(wf, Omega, dOmega, dwf, lrplot=cfplot)
 
 cf_Ix = Iz / (1 - slope)
-cf_dIx = 1 / (1 - slope) * sqrt(dIz**2 + (Iz * dslope / (1 - slope))**2)
+cf_dIx = 1 / (1 - slope) * sqrt(Iz_dtot**2 + (Iz * dslope / (1 - slope))**2)
 
 print(val('Ix (color)     ', cf_Ix, cf_dIx))
 
 # nutation
-nutplot = plot(title = 'nutation frequency f_n as a function of figure frequency f_f', xlabel='f_f / Hz', ylabel='f_n / Hz', fig=3)
+nutplot = plot(title = r'nutation frequency $f_n$ as a function of figure frequency $f_f$', xlabel='f_f / Hz', ylabel='f_n / Hz', fig=3)
 f_f = nut_umin_f / 60.
 df_f = nut_dumin_f / 60.
 f_n = nut_umin_n / 60.
@@ -125,13 +123,13 @@ df_n = nut_dumin_n / 60.
 [slope, dslope, yitc, dyitc] = linreg(f_f, f_n, df_n, df_f, lrplot=nutplot)
 
 nut_Ix = Iz / slope
-nut_dIx = 1 / slope * sqrt(dIz**2 + (Iz * dslope / slope)**2)
+nut_dIx = 1 / slope * sqrt(Iz_dtot**2 + (Iz * dslope / slope)**2)
 
 print(val('Ix (nutation)  ', nut_Ix, nut_dIx))
 
 # comparison Ix
 print()
-print(sig('deviation', cf_Ix, cf_dIx, nut_Ix, nut_dIx))
+print(sig('deviation Ix', cf_Ix, cf_dIx, nut_Ix, nut_dIx))
 
 # show matplotlib figs
 print()
