@@ -1,4 +1,4 @@
-### measure libraby version 1.6.3
+### measure libraby version 1.7
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -23,23 +23,32 @@ e = 1.602176634e-19 # Elementary charge
 kB = 1.380649e-23 # Boltzmann constant
 NA = 6.02214076e23 # Avogadro constant
 T0 = 273.15 # Zero Celsius in Kelvin
-g = 9.80984 # Gravitantional Acceleration in Heidelberg 
-dg = 2e-5 # Uncertanty of the gravitational Acceleration
+g = 9.80984 # Gravitantional acceleration in Heidelberg 
+dg = 2e-5 # Uncertanty of the gravitational acceleration
 
-def mean_value(x):
+def npfarray(x):
+  return np.array(x, dtype='float')
+
+def mv(x):
   s = 0.0
   for i in range(len(x)):
     s += x[i]
   return s / len(x)
 
-def std_dev_e(x):
-  qs = 0.0
+def dsto(x):
+  s = 0.0
   for i in range(len(x)):
-    qs += (x[i] - mean_value(x))**2
-  return np.sqrt(qs / (len(x) - 1))
+    s += (x[i] - mv(x))**2
+  return sqrt(s / (len(x) - 1))
 
-def std_dev_m(x):
-  return std_dev_e(x) / np.sqrt(len(x))
+def dsto_mv(x):
+  return dsto(x) / sqrt(len(x))
+
+def dsys_mv(x):
+  return sqrt(np.sum(x**2)) / len(x)
+
+def dtot(dsys, dsto):
+  return sqrt(dsys**2 + dsto**2)
 
 def signval(val, err=0.0):
   if (err == 0.0):

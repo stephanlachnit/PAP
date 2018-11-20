@@ -1,4 +1,4 @@
-# measure version 1.6.3
+# measure version 1.7
 
 # Significant values
 bval = False
@@ -21,8 +21,8 @@ if (btable == True):
   print()
   print('Tables')
   from measure import tbl
-  data = [[10,2e-100,3], [2,40,600]]
-  names = ['a', 'b']
+  data = [[10,2e-100,3], [2,40,600], [20, 40, 13]]
+  names = ['a', 'b', 'c']
   print(tbl(names, data))
 
 # Statistical evaluation
@@ -30,12 +30,12 @@ bstat = False
 if (bstat == True):
   print()
   print('Statistical evaluation')
-  from measure import val,mean_value,std_dev_e,std_dev_m,chi2, chi2_red
+  from measure import val,mv,dsto,dsto_mv,chi2, chi2_red
   x = [2.33, 2.37, 2.21, 2.32, 2.17, 2.44, 2.11]
   x0 = x[2]
-  xm = mean_value(x)
-  dx = std_dev_e(x)
-  dxm = std_dev_m(x)
+  xm = mv(x)
+  dx = dsto(x)
+  dxm = dsto_mv(x)
   print(val('Mean value', xm, dxm))
   print(val('Some value', x0, dx))
   xobserved = [1.1, 1.9, 3.2, 3.8, 5.2]
