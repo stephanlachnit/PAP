@@ -1,4 +1,4 @@
-### measure libraby version 1.7
+### measure libraby version 1.7.1
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -75,7 +75,7 @@ def signval(val, err=0.0):
 def val(name, val, err=0.0):
   out = ''
   if (name != ''):
-    out += name + ': '
+    out += name + ' = '
   tmp = signval(val, err)
   out += tmp[0]
   if (tmp[1] != ''):
