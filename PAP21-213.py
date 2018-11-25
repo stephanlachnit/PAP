@@ -1,16 +1,17 @@
-# measure version: 1.7
+# measure version: 1.7.1
 from measure import np,pi,g,dg,ln,exp,sqrt,val,lst,tbl,sig,mv,dsto_mv,dsys_mv,dtot,linreg,plot
 
 # values
 m_k = 4.164
 m_s = 9.85e-3
+r_k = 50.8e-3
 
 damping_umin = np.array([1070, 970, 890, 808, 737, 675, 620, 569], dtype='float')
 damping_dumin = np.array([10, 5, 4, 2, 3, 3, 2, 4], dtype='float')
 damping_t = np.array([0, 2, 4, 6, 8, 10, 12, 14], dtype='float')
 
 moa_umin_1x15 = np.array([640, 560, 420, 300], dtype='float')
-moa_Tp_1x15 = np.array([144, 90, 70, 49], dtype='float')
+moa_Tp_1x15 = np.array([104, 90, 70, 49], dtype='float')
 moa_umin_1x20 = np.array([700, 600, 430, 270], dtype='float')
 moa_Tp_1x20 = np.array([89, 77, 57, 36], dtype='float')
 moa_umin_2x15 = np.array([670, 580, 430, 300], dtype='float')
@@ -41,7 +42,7 @@ dD = dslope
 f0 = exp(yitc)
 df0 = exp(yitc) * dyitc
 
-dampingplot = plot(title='Calculation for damping constant', xlabel='t / s', ylabel='f / Hz', fig=1, scale='linlog')
+dampingplot = plot(title='Linear regression of the damping constant', xlabel='t / s', ylabel='f / Hz', fig=1, scale='linlog')
 dampingplot.plt.grid(False)
 dampingplot.plotdata(t, f, df)
 dampingplot.plotfunc(t, f0 * exp(-D * t), label='line of best fit')
@@ -69,11 +70,11 @@ moaplot = plot(title='precession period as function of the rotation frequency', 
 Iz_1x15 = m_s * g * 0.15 * slope_1x15 / (2.*pi)**2
 dIz_1x15 = m_s * 0.15 / (2.*pi)**2 * sqrt((g * dslope_1x15)**2 + (dg * slope_1x15)**2)
 Iz_1x20 = m_s * g * 0.20 * slope_1x20 / (2.*pi)**2
-dIz_1x20 = m_s * 0.15 / (2.*pi)**2 * sqrt((g * dslope_1x20)**2 + (dg * slope_1x20)**2)
+dIz_1x20 = m_s * 0.20 / (2.*pi)**2 * sqrt((g * dslope_1x20)**2 + (dg * slope_1x20)**2)
 Iz_2x15 = 2.*m_s * g * 0.15 * slope_2x15 / (2.*pi)**2
-dIz_2x15 = m_s * 0.15 / (2.*pi)**2 * sqrt((g * dslope_2x15)**2 + (dg * slope_2x15)**2)
+dIz_2x15 = 2.*m_s * 0.15 / (2.*pi)**2 * sqrt((g * dslope_2x15)**2 + (dg * slope_2x15)**2)
 Iz_2x20 = 2.*m_s * g * 0.20 * slope_2x20 / (2.*pi)**2
-dIz_2x20 = m_s * 0.15 / (2.*pi)**2 * sqrt((g * dslope_2x20)**2 + (dg * slope_2x20)**2)
+dIz_2x20 = 2.*m_s * 0.20 / (2.*pi)**2 * sqrt((g * dslope_2x20)**2 + (dg * slope_2x20)**2)
 
 Iz_list = np.array([Iz_1x15, Iz_1x20, Iz_2x15, Iz_2x20])
 dIz_list = np.array([dIz_1x15, dIz_1x20, dIz_2x15, dIz_2x20])
@@ -127,10 +128,18 @@ nut_dIx = 1 / slope * sqrt(Iz_dtot**2 + (Iz * dslope / slope)**2)
 
 print(val('Ix (nutation)  ', nut_Ix, nut_dIx))
 
-# comparison Ix
+# comparison
+I_sphere = 2./5. * m_k * r_k**2
+
 print()
 print(sig('deviation Ix', cf_Ix, cf_dIx, nut_Ix, nut_dIx))
+print()
+print(val('Theoretical Value', I_sphere))
+print(sig('dev Iz', Iz, Iz_dtot, I_sphere))
+print(sig('dev Ix (cf)', cf_Ix, cf_dIx, I_sphere))
+print(sig('dev Ix (nut)', nut_Ix, nut_dIx, I_sphere))
 
 # show matplotlib figs
 print()
 plot.showfigs()
+
