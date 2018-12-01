@@ -1,10 +1,11 @@
-### measure libraby version 1.7.1
+### measure libraby version 1.8
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
 minfloat = 1e-80 # replaces zeros in linreg
+default_dpi = 144.0 # default dpi for plots
 
 # Variables for export
 sqrt = np.sqrt
@@ -82,7 +83,18 @@ def val(name, val, err=0.0):
     out += ' ± ' + tmp[1]
   return out
 
-def lst(name, val, err=[]):
+def lst(val, err=[], name=''):
+  """
+  Parameters
+
+  val: Array of floats with length N, which represent measured values
+  err: Array of floats with length N, which represent the errors of the corresponding values
+  name: String, which is added before the list
+  ----------
+  Returns
+
+  Array of strings, where each string is in the form val[i] ± err[i]
+  """
   if (err == []):
     err = [0.0 for i in range(len(val))]
   N = len(val)
@@ -94,37 +106,42 @@ def lst(name, val, err=[]):
       valmaxlen = len(tmp[0])
     if (len(tmp[1]) > errmaxlen):
       errmaxlen = len(tmp[1])
-  out = ''
+  out = []
   if (name != ''):
-    out += name + ':'
+    out.append(name)
   for i in range(len(val)):
     tmp = signval(val[i], err[i])
-    out +=  '\n ' + tmp[0].ljust(valmaxlen)
+    tmp2 =  tmp[0].ljust(valmaxlen)
     if (tmp[1] != ''):
-      out += ' ± ' + tmp[1].ljust(errmaxlen)
+      tmp2 += ' ± ' + tmp[1].ljust(errmaxlen)
     elif (errmaxlen != 0):
-      out += ''.ljust(errmaxlen + 3)
+      tmp2 += ''.ljust(errmaxlen + 3)
+    out.append(tmp2)
   return out
 
-def tbl(names, vals, errs=[]):
+def tbl(lists, title=''):
+  """
+  Parameters
+
+  lists: Array of rowarrays with length N, which should be arrays with length M of the column strings.
+  title: String, which is added before the table
+  ----------
+  Returns
+
+  String of the MxN array.
+  """
+  M = len(lists[0])
+  N = len(lists)
   out = ''
-  if (errs == []):
-    errs = [[] for i in range(len(vals))]
-  tmp = []
-  for i in range(len(names)):
-    tmp.append(lst(names[i], vals[i], errs[i]))
-  tmp = [tmp[i].split('\n') for i in range(len(tmp))]
-  lens = [len(tmp[i][1]) for i in range(len(tmp))]
-  for i in range(len(tmp[0])):
-    for j in range(len(tmp)):
-      if (i == 0):
-        out += (' ' + tmp[j][i]).ljust(lens[j])
-      else:
-        out += tmp[j][i]
-      if (j != len(tmp) - 1 ):
-        out += ' |'
-    if (i != len(tmp[0]) - 1):
-      out += '\n'
+  if (title != ''):
+    out += title + ':\n'
+  lens = [int(npfarray([len(lists[i][j]) for j in range(M)]).max()) for i in range(N)]
+  for j in range(M):
+    for i in range(N):
+      suffix = ' | '
+      if (i == N-1):
+        suffix = '\n' 
+      out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
 def sig(name, val1, dVal1, val2, dVal2=0.0):
@@ -161,15 +178,17 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
     dof = len(ye)
   return chi2(yo, dyo, ye, dye) / dof
 
-class plot:
-  # todo: plot shouldn't replace plt, more like expand it with usefull presets
-  def __init__(self, title='', xlabel='', ylabel='', fig=0, scale='linlin'):
-    self.figure = plt.figure(fig)
-    plt.clf()
+class pltext:
+  @staticmethod
+  def initplot(num=0, title='', xlabel='', ylabel='', scale='linlin', dpi=default_dpi):
+    fig = plt.figure(num)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
+    fig.dpi = dpi
+    fig.set_size_inches(11.69,8.27)
+    plt.tight_layout()
     if (scale == 'linlin'):
       plt.ticklabel_format(style='sci', axis='both', scilimits=(-2,3))
     elif (scale == 'linlog'):
@@ -182,29 +201,17 @@ class plot:
       plt.yscale('log')
       plt.xscale('log')
 
-  def plotdata(self, x, y, dy=[], dx=[], label='', color=None):
+  @staticmethod
+  def plotdata(x, y, dy=[], dx=[], label='', color=None):
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
       dy = [0.0 for i in range(len(y))]
-    plt.errorbar(x, y, dy, dx, label=label, color=color, fmt='o', markersize=3)
-    if (label != ''):
-      plt.legend()
-  
-  def plotfunc(self, x, y, label=''):
-    plt.plot(x, y, label=label, marker='')
+    plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=3)
     if (label != ''):
       plt.legend()
 
-  figure = None
-
-  plt = plt
-
-  @staticmethod
-  def showfigs():
-    plt.show()
-
-def linreg(x, y, dy, dx=[], lrplot=None, graphname=''):
+def linreg(x, y, dy, dx=[], plot=False, graphname=''):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -235,22 +242,19 @@ def linreg(x, y, dy, dx=[], lrplot=None, graphname=''):
       dy = [np.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
-  if (lrplot != None):
+  if (plot == True):
     [g, dg, b, db] = result
     min_x = np.argmin(x)
     max_x = np.argmax(x)
     xint = [x[min_x] - dx[min_x], x[max_x] + dx[max_x]]
     yfit = [g * xint[i] + b for i in range(2)]
     yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
-    datalabel = prefix = ''
-    if (graphname != ''):
-      prefix = graphname + ': '
-      datalabel = prefix + 'data points'
-    fitfunc = plt.plot(xint, yfit, label=prefix+'line of best fit', marker='')
+    fitfunc = plt.plot(xint, yfit, marker='')
     color = fitfunc[0].get_color()
-    plt.plot(xint, yerr, label=prefix+'line of uncertainty', marker='', linestyle='dashed', color=color)
-    lrplot.plotdata(x, y, dy, dx, label=datalabel, color=color)
-    plt.legend()
+    plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
+    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
+    if (graphname != ''):
+      plt.legend()
   return result
 
 def lin_yerr(x, dx, y, dy):
