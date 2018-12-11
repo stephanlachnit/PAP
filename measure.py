@@ -1,4 +1,4 @@
-### measure libraby version 1.8
+### measure libraby version 1.8.1
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -202,12 +202,16 @@ class pltext:
       plt.xscale('log')
 
   @staticmethod
-  def plotdata(x, y, dy=[], dx=[], label='', color=None):
+  def plotdata(x, y, dy=[], dx=[], label='', color=None, connect=False):
     if (dx == []):
       dx = [0.0 for i in range(len(x))]
     if (dy == []):
       dy = [0.0 for i in range(len(y))]
-    plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=3)
+    plot = plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=3)
+    if (connect == True):
+      if (color == None):
+        color = plot[0].get_color()
+      plt.plot(x, y, color=color)
     if (label != ''):
       plt.legend()
 
