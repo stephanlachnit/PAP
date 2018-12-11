@@ -1,6 +1,7 @@
 ### measure libraby version 1.8.2
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
 
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
