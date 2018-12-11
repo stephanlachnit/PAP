@@ -1,4 +1,4 @@
-### measure libraby version 1.8.1
+### measure libraby version 1.8.2
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -182,7 +182,7 @@ class pltext:
   @staticmethod
   def initplot(num=0, title='', xlabel='', ylabel='', scale='linlin', dpi=default_dpi):
     fig = plt.figure(num)
-    plt.title(title)
+    plt.title(title, fontsize='14')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
