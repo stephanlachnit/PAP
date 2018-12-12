@@ -117,7 +117,7 @@ print()
 print(tbl([['Qel']+lst(Qel,Qel_dtot),['Qab']+lst(Qab,Qab_dtot),['Wpv']+lst(wk_Wpv_mv,wk_Wpv_dsto),['W_D']+lst(W_D,W_D_dsys)]))
 print(tbl([['Pel']+lst(Pel,Pel_dtot),['Pab']+lst(Pab,Pab_dtot),['Ppv']+lst(Ppv,Ppv_dsto),['P_D']+lst(P_D,P_D_dtot)]))
 print(tbl([['Q_V (Wpv)']+lst(Q_V_pv,Q_V_pv_dtot),['Q_V (W_D)']+lst(Q_V_D,Q_V_D_dtot),['P_V (Wpv)']+lst(P_V_pv,P_V_pv_dtot),['P_V (W_D)']+lst(P_V_D,P_V_D_dtot)]))
-print(tbl([['n_th']+lst(wk_n_th,wk_n_th_dtot),['n_eff']+lst(wk_n_eff,wk_n_eff_dsys)]))
+print(tbl([['f']+lst(wk_f_mv,wk_f_dsto),['F']+lst(wk_F,wk_F_dsys),['n_th']+lst(wk_n_th,wk_n_th_dtot),['n_eff']+lst(wk_n_eff,wk_n_eff_dsys)]))
 
 pltext.initplot(title='Wirkungsgrade in Abhängigkeit von der Frequenz', xlabel='Frequenz f / Hz', ylabel='Wirkungsgrad')
 pltext.plotdata(wk_f_mv, wk_n_th, wk_n_th_dtot, wk_f_dsto, label=r'$n_{th}$', connect=True)
