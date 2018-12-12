@@ -13,8 +13,8 @@ for n in range(168):
   dx = np.append(dx, x[n+1] - x[n])
   dy = np.append(dy, y[n+1] - y[n])
 
-r_k = 755e-9
-r_k_dsys = 30e-9
+r_k = 755e-9 / 2.
+r_k_dsys = 30e-9 / 2.
 T = npfarray([22.6,23.0])
 T_dsys = npfarray([0.1,0.1])
 T_mv = mv(T) + T0
