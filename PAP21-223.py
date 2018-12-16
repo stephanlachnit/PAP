@@ -27,8 +27,8 @@ pltext.initplot(num=1,title='Bewegung des Teilchens',xlabel='x in m',ylabel='y i
 plt.plot(x,y, marker='s')
 plt.savefig('fig1.pdf', format='pdf')
 
-# Histogramm
-r_sqr = (dx**2+dy**2)
+# mittleres Verschiebungsquadrat
+r_sqr = dx**2+dy**2
 r_sqr_mv = mv(r_sqr)
 r_sqr_dsto = dsto_mv(r_sqr)
 dt_mv = mv(dt)
@@ -39,6 +39,14 @@ hist_D_dtot = 1. / (4. * dt_mv) * sqrt(r_sqr_dsto**2 + (r_sqr_mv * dt_dsto / dt_
 hist_kB = 6.*pi * nu * r_k * hist_D / T_mv
 hist_kB_dtot = 6.*pi / T_mv * sqrt((nu_dsys * r_k * hist_D)**2 + (nu * r_k_dsys * hist_D)**2 + (nu * r_k * hist_D_dtot)**2 + (nu * r_k * hist_D * T_dtot / T_mv)**2)
 
+print()
+print('Mittelung:')
+print(val('mittleres Verschiebungsquadrat', r_sqr_mv, r_sqr_dsto))
+print(val('mittlerer Zeitabschnitt', dt_mv, dt_dsto))
+print(val('Diffusionskonstante D', hist_D, hist_D_dtot))
+print(val('Bolatzmannkonstante k', hist_kB, hist_kB_dtot))
+
+# Histogramm
 d_all = 1e6 * np.append(dx,dy)
 points = npfarray([0.01 * n for n in range(-300,301)])
 mu = mv(d_all)
@@ -52,11 +60,6 @@ plt.hist(d_all,density=True)
 plt.plot(points,gauss)
 plt.text(-2.41,0.504,'σ = '+val('',sigma)+'\nμ = '+val('',mu))
 plt.savefig('fig2.pdf', format='pdf')
-
-print()
-print('Histogramm:')
-print(val('Diffusionskonstante D', hist_D, hist_D_dtot))
-print(val('Bolatzmannkonstante k', hist_kB, hist_kB_dtot))
 
 # Kumulative Verteilung der Verschiebungsquadrate
 r_kum = np.cumsum(r_sqr)
@@ -84,6 +87,7 @@ plt.savefig('fig3.pdf', format='pdf')
 
 print()
 print('Kumulative Verteilung:')
+print(val('Steigung', slope, slope_dtot))
 print(val('Diffusionskonstante D', vert_D, vert_D_dtot))
 print(val('Bolatzmannkonstante k', vert_kB, vert_kB_dtot))
 
@@ -93,7 +97,8 @@ print('Vergleich der Werte zueinander:')
 print(sig('Abweichung',hist_kB,hist_kB_dtot,vert_kB,vert_kB_dtot))
 print()
 print('Vergleich mit dem Literaturwert:')
-print(sig('Histogramm',hist_kB,hist_kB_dtot,kB))
-print(sig('Verteilung',vert_kB,vert_kB_dtot,kB))
+print(sig('Mittelung',hist_kB,hist_kB_dtot,kB))
+print(sig('Kumulativ',vert_kB,vert_kB_dtot,kB))
+print()
 
 plt.show()
