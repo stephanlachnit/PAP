@@ -29,7 +29,7 @@ def gaus(p , A ,  mu , sigma  ):
      return A * np.exp(-(p-mu)**2/(2*sigma**2)) 
 
   
-x , y = np.loadtxt('F:\\Users\\Felix\\Documents\\Privat\\Eigene Dokumente\\Uni Heidelberg\\3. Semester\\Anfängerpraktikum 2\\232\\Messung.csv', delimiter = ','  , usecols=(0,1) , converters = {1:comma_to_float, 2:comma_to_float, 3:comma_to_float}, unpack = True) 
+x , y = np.loadtxt('Messung.csv', skiprows=2, delimiter = ','  , usecols=(0,1) , converters = {1:comma_to_float, 2:comma_to_float, 3:comma_to_float}, unpack = True) 
 y = y - np.mean(y) 
 
 s = 3e-3
