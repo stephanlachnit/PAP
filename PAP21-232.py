@@ -62,17 +62,17 @@ print(val('n0',n0,n0_dtot))
 kl_U = kl_U - mv(kl_U)
 U_top = []
 t_top = []
-lastmax = np.min(kl_U)
+lastmax = np.min(abs(kl_U))
 for n in range(len(kl_U)):
-  if (kl_U[n] > lastmax):
-    U_top.append(kl_U[n])
-    lastmax = kl_U[n]
+  if (abs(kl_U[n]) > lastmax):
+    U_top.append(abs(kl_U[n]))
+    lastmax = abs(kl_U[n])
     t_top.append(kl_t[n])
     lastn = n + 1
 
 for n in range(lastn, len(kl_U)):
-  if kl_U[n] >= np.max([kl_U[j] for j in range(n,len(kl_U))]):
-    U_top.append(kl_U[n])
+  if abs(kl_U[n]) >= np.max([abs(kl_U[j]) for j in range(n,len(kl_U))]):
+    U_top.append(abs(kl_U[n]))
     t_top.append(kl_t[n])
 
 def gauss(x, A, mu, sigma):
@@ -96,4 +96,4 @@ print()
 print(sig('Wellenlänge',wl_mv,wl_mv_dtot,wl_lit,wl_lit))
 print(sig('Brechungsindex',n0,n0_dtot,bi_n0_lit))
 
-#plt.show()
+plt.show()
