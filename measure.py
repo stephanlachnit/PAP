@@ -1,4 +1,4 @@
-### measure libraby version 1.8.2
+### measure libraby version 1.8.3
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -25,6 +25,7 @@ e = 1.602176634e-19 # Elementary charge
 kB = 1.380649e-23 # Boltzmann constant
 NA = 6.02214076e23 # Avogadro constant
 T0 = 273.15 # Zero Celsius in Kelvin
+p0 = 101325 # NIST standard pressure
 g = 9.80984 # Gravitantional acceleration in Heidelberg 
 dg = 2e-5 # Uncertanty of the gravitational acceleration
 
