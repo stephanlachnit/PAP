@@ -1,4 +1,4 @@
-# measure version 1.8.3
+# measure version 1.8.4
 from measure import npfarray,np,exp,sqrt,ln,mv,dsto_mv,dsys_mv,dtot,val,tbl,lst,T0,p0,plt,pltext,linreg,sig,curve_fit
 
 # Messwerte
@@ -7,7 +7,7 @@ wl_sa_dsys = npfarray([10,10,10,10,10])*1e-6
 wl_se = npfarray([2930,2951,3155,3370,3677])*1e-6
 wl_se_dsys = npfarray([10,10,10,10,10])*1e-6
 wl_m = npfarray([11165,11136,11134,11163,11170])
-wl_m_dsys = npfarray([1,1,1,1,1])
+wl_m_dsys = npfarray([2,2,2,2,2])
 wl_lit = 532e-9
 wl_lit_dsys = 1e-9
 
@@ -42,9 +42,9 @@ wl_mv_dtot = dtot(wl_mv_dsys, wl_mv_dsto)
 
 print()
 print('Wellenlänge Laser:')
-print(tbl([lst(ds,ds_dsys,'ds'),lst(wl,wl_dsys,'wl')],))
+print(tbl([lst(ds,ds_dsys,'ds'),lst(wl_m,wl_m_dsys,'m'),lst(wl,wl_dsys,'wl')],))
 print(val('Mitellwert',wl_mv,wl_mv_dtot))
-print(sig('Abweichung',wl_mv,wl_mv_dtot,wl_lit,wl_lit))
+print(sig('Abweichung',wl_mv,wl_mv_dtot,wl_lit,wl_lit_dsys))
 
 # Brechungsindex Luft
 pltext.initplot(num=1, title='Brechungsindex Luft', xlabel='Intensitätsringe', ylabel='Druck in Pa')
