@@ -78,7 +78,8 @@ def signval(val, err=0.0):
       val = float('{:.0e}'.format(val))
       sdigits = 1
   else:
-    if ('{:.{digits}e}'.format(val, digits=sdigits)[0] != '{:e}'.format(val)[0]):
+    if (int(np.floor(np.log10(abs(float('{:.{digits}e}'.format(val, digits=sdigits))))) - np.floor(np.log10(err))) != expdiff):
+      val = float('{:.{digits}e}'.format(val, digits=sdigits))
       sdigits += 1
   valstr = '{:.{digits}e}'.format(val, digits=sdigits)
   return [valstr, errstr]
