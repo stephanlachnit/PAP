@@ -59,7 +59,7 @@ n0_dtot = p0 / (2. * abs(slope) * bi_a * T0) * sqrt((wl_mv_dtot * bi_T)**2 + (wl
 
 print()
 print('Brechungsindex Luft:')
-print(val('m/p',slope,slope_dtot))
+print(val('slope',slope,slope_dtot))
 print(val('n0',n0,n0_dtot))
 print(sig('Abweichung',n0,n0_dtot,bi_n0_lit))
 
