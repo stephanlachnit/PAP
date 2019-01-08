@@ -1,5 +1,5 @@
 # measure version 1.8.3
-from measure import npfarray,np,exp,sqrt,ln,mv,dsto_mv,dsys_mv,dtot,val,tbl,T0,p0,plt,pltext,linreg,sig,curve_fit
+from measure import npfarray,np,exp,sqrt,ln,mv,dsto_mv,dsys_mv,dtot,val,tbl,lst,T0,p0,plt,pltext,linreg,sig,curve_fit
 
 # Messwerte
 wl_sa = npfarray([-36,0,200,404,706])*1e-6
@@ -31,16 +31,20 @@ kl_U = npfarray([0.03506667,-0.00493333,-0.00493333,0.03506667,-0.00493333,0.035
 kl_v = 0.1e-3
 
 # Wellenlänge Laser
-wl = 2. * (wl_se - wl_sa) / wl_m
-wl_dsys = 2. / wl_m * sqrt(wl_se_dsys**2 + wl_sa_dsys**2 + (wl_m_dsys/wl_m)**2)
+ds = wl_se - wl_sa
+ds_dsys = sqrt(wl_se_dsys**2 + wl_sa_dsys**2)
+wl = 2. * ds / wl_m
+wl_dsys = 2. / wl_m * sqrt(ds_dsys**2 + (wl_m_dsys/wl_m)**2)
 wl_mv = mv(wl)
 wl_mv_dsto = dsto_mv(wl)
 wl_mv_dsys = dsys_mv(wl_dsys)
 wl_mv_dtot = dtot(wl_mv_dsys, wl_mv_dsto)
 
 print()
-print('Wellenlänge Laser')
-print(val('wl',wl_mv,wl_mv_dtot))
+print('Wellenlänge Laser:')
+print(tbl([lst(ds,ds_dsys,'ds'),lst(wl,wl_dsys,'wl')],))
+print(val('Mitellwert',wl_mv,wl_mv_dtot))
+print(sig('Abweichung',wl_mv,wl_mv_dtot,wl_lit,wl_lit))
 
 # Brechungsindex Luft
 pltext.initplot(num=1, title='Brechungsindex Luft', xlabel='Intensitätsringe', ylabel='Druck in Pa')
@@ -54,9 +58,10 @@ n0 = (wl_mv * p0 * bi_T) / (2. * slope * bi_a * T0) + 1.
 n0_dtot = p0 / (2. * abs(slope) * bi_a * T0) * sqrt((wl_mv_dtot * bi_T)**2 + (wl_mv * bi_T_dtot)**2 + (bi_a_dsys/bi_a)**2 + (slope_dtot/slope)**2)
 
 print()
-print('Brechungsindex Luft')
+print('Brechungsindex Luft:')
 print(val('m/p',slope,slope_dtot))
 print(val('n0',n0,n0_dtot))
+print(sig('Abweichung',n0,n0_dtot,bi_n0_lit))
 
 # Kohärenzlänge
 kl_U = kl_U - mv(kl_U)
@@ -78,22 +83,23 @@ for n in range(lastn, len(kl_U)):
 def gauss(x, A, mu, sigma):
   return A * exp(-(x - mu)**2 / (2. * sigma**2))
 popt, pcov = curve_fit(gauss, t_top, U_top)
+sigma = popt[2]
+sigma_dtot = sqrt(pcov[2][2])
 
 t_int = npfarray([0.1e-2 * n for n in range(-30,91)])
 pltext.initplot(num=2, title='Signalverlauf LED', xlabel='Zeit in s', ylabel='Spannung in V')
 plt.plot(kl_t, kl_U, label='Messwerte')
 plt.plot(t_int, gauss(t_int, popt[0], popt[1], popt[2]), label='Gaußfit')
 
-fwhm = 2.*kl_v * popt[2] * 2.*sqrt(2. * ln(2.))
+fwhm = 2.*kl_v * sigma * 2.*sqrt(2. * ln(2.))
+fwhm_dtot = 2.*kl_v * sigma_dtot * 2.*sqrt(2. * ln(2.))
 L = wl_mv**2 / fwhm
+L_dtot = wl_mv / fwhm * sqrt((2. * wl_mv_dtot)**2 + (wl_mv * fwhm_dtot/fwhm)**2)
 
 print()
-print('Kohärenzlänge LED')
-print(val('L',L))
-
-# Vergleich
-print()
-print(sig('Wellenlänge',wl_mv,wl_mv_dtot,wl_lit,wl_lit))
-print(sig('Brechungsindex',n0,n0_dtot,bi_n0_lit))
+print('Kohärenzlänge LED:')
+print(val('sigma',sigma,sigma_dtot))
+print(val('FWHM',fwhm,fwhm_dtot))
+print(val('L',L,L_dtot))
 
 plt.show()
