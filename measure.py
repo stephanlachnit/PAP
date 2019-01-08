@@ -1,4 +1,4 @@
-### measure libraby version 1.8.3
+### measure libraby version 1.9
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -56,22 +56,30 @@ def dtot(dsys, dsto):
 def signval(val, err=0.0):
   if (err == 0.0):
     return ['{:g}'.format(val), '']
-  if ('{:.1e}'.format(err)[0] == '9' and '{:.0e}'.format(err)[0] == '1'):
-    err = float('{:.0e}'.format(err))
-  firstdigit = int('{:.1e}'.format(err)[0])
-  if (firstdigit <= 2):
-    round2 = 1
-    errstr = '{:.1e}'.format(err)
-  else:
-    round2 = 0
-    errstr = '{:.0e}'.format(err)
+  errstr = '{:.1e}'.format(err)
+  err = float(errstr)
   expdiff = int(np.floor(np.log10(abs(val))) - np.floor(np.log10(err)))
-  if (expdiff < 0):
-    sdigits = 0 #bug: try val('',0.999,1.1) and val('',1.0,1.1)
-    if (round2 != 1 or expdiff != -1):
+  sdigits = expdiff + 1
+  if (expdiff < -2):
+    val = 0.0
+    sdigits = 0
+  elif (expdiff == -2):
+    if (int('{:e}'.format(abs(val))[0]) >= 5):
+      sig = val / abs(val)
+      val = sig * 10**int(1+np.floor(np.log10(abs(val))))
+    else:
       val = 0.0
+    sdigits = 0
+  elif (expdiff == -1):
+    if (int(np.floor(np.log10(abs(float('{:.0e}'.format(val))))) - np.floor(np.log10(err))) == -1):
+      val = val
+      sdigits = 0
+    else:
+      val = float('{:.0e}'.format(val))
+      sdigits = 1
   else:
-    sdigits = expdiff + round2
+    if ('{:.{digits}e}'.format(val, digits=sdigits)[0] != '{:e}'.format(val)[0]):
+      sdigits += 1
   valstr = '{:.{digits}e}'.format(val, digits=sdigits)
   return [valstr, errstr]
 
