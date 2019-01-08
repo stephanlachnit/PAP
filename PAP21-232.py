@@ -91,15 +91,12 @@ pltext.initplot(num=2, title='Signalverlauf LED', xlabel='Zeit in s', ylabel='Sp
 plt.plot(kl_t, kl_U, label='Messwerte')
 plt.plot(t_int, gauss(t_int, popt[0], popt[1], popt[2]), label='Gaußfit')
 
-fwhm = 2.*kl_v * sigma * 2.*sqrt(2. * ln(2.))
-fwhm_dtot = 2.*kl_v * sigma_dtot * 2.*sqrt(2. * ln(2.))
-L = wl_mv**2 / fwhm
-L_dtot = wl_mv / fwhm * sqrt((2. * wl_mv_dtot)**2 + (wl_mv * fwhm_dtot/fwhm)**2)
+L = 2.*kl_v * sigma * 2.*sqrt(2. * ln(2.))
+L_dtot = 2.*kl_v * sigma_dtot * 2.*sqrt(2. * ln(2.))
 
 print()
 print('Kohärenzlänge LED:')
 print(val('sigma',sigma,sigma_dtot))
-print(val('FWHM',fwhm,fwhm_dtot))
 print(val('L',L,L_dtot))
 
 plt.show()
