@@ -1,4 +1,4 @@
-### measure libraby version 1.8.4
+### measure libraby version 1.8.5
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -6,7 +6,6 @@ from scipy.optimize import curve_fit
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
 minfloat = 1e-80 # replaces zeros in linreg
-default_dpi = 144.0 # default dpi for plots
 
 # Variables for export
 sqrt = np.sqrt
@@ -191,13 +190,12 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
 
 class pltext:
   @staticmethod
-  def initplot(num=0, title='', xlabel='', ylabel='', scale='linlin', dpi=default_dpi):
+  def initplot(num=0, title='', xlabel='', ylabel='', scale='linlin'):
     fig = plt.figure(num)
     plt.title(title, fontsize='14')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
-    fig.dpi = dpi
     fig.set_size_inches(11.69,8.27)
     plt.tight_layout()
     if (scale == 'linlin'):
