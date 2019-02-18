@@ -172,7 +172,7 @@ def sig(name, val1, dVal1, val2, dVal2=0.0, perc=False):
     sigstr = '{:.{digits}f}'.format(sigma, digits = digits)
   percstr = ''
   if (perc == True):
-    percval = abs(val1 - val2) / val2
+    percval = abs(val1 - val2) / val2 * 100
     percstr = ' ; ' + '{:.2g}'.format(percval) + '%'
   prefix = ''
   if (name != ''):
