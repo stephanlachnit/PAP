@@ -9,7 +9,7 @@ sig12_lit = 1
 p0 = npfarray([sqrt_Er_lit,sig12_lit])
 
 print()
-print(val('Literaturwer sqrt(Er)',sqrt_Er_lit))
+print(val('Literaturwert sqrt(Er)',sqrt_Er_lit))
 
 # K_alpha
 K_alpha = npfarray([6.42,17.47,8.08,4.49,21.90,15.79,8.68,7.51])
@@ -29,8 +29,8 @@ popt,pcov = curve_fit(fit_func_alpha,Z,sqrt_K_alpha,sigma=Delta_sqrt_K_alpha,p0=
 
 sqrt_Er_alpha = popt[0]
 Delta_sqrt_Er_alpha = sqrt(pcov[0,0])
-sig12_alpha = popt[0]
-Delta_sig12_alpha = sqrt(pcov[0,0])
+sig12_alpha = popt[1]
+Delta_sig12_alpha = sqrt(pcov[1,1])
 
 plt.plot(Z, fit_func_alpha(Z,*popt))
 
@@ -60,8 +60,8 @@ popt,pcov = curve_fit(fit_func_beta,Z,sqrt_K_beta,sigma=Delta_sqrt_K_beta,p0=p0)
 
 sqrt_Er_beta = popt[0]
 Delta_sqrt_Er_beta = sqrt(pcov[0,0])
-sig12_beta = popt[0]
-Delta_sig12_beta = sqrt(pcov[0,0])
+sig12_beta = popt[1]
+Delta_sig12_beta = sqrt(pcov[1,1])
 
 plt.plot(Z, fit_func_beta(Z,*popt))
 
@@ -70,7 +70,6 @@ print('K_beta:')
 print(val('sqrt(Er)',sqrt_Er_beta,Delta_sqrt_Er_beta))
 print(sig('Abweichung',sqrt_Er_beta,Delta_sqrt_Er_beta,sqrt_Er_lit,perc=True))
 print(val('sig12',sig12_beta,Delta_sig12_beta))
-print(sig('Abweichung',sig12_beta,Delta_sig12_beta,sig12_lit,perc=True))
 
 # K_beta ohne Ti
 
@@ -87,8 +86,8 @@ popt,pcov = curve_fit(fit_func_beta,Z_boTi,sqrt_K_boTi,sigma=Delta_sqrt_K_boTi,p
 
 sqrt_Er_boTi = popt[0]
 Delta_sqrt_Er_boTi = sqrt(pcov[0,0])
-sig12_boTi = popt[0]
-Delta_sig12_boTi = sqrt(pcov[0,0])
+sig12_boTi = popt[1]
+Delta_sig12_boTi = sqrt(pcov[1,1])
 
 plt.plot(Z_boTi, fit_func_beta(Z_boTi,*popt))
 
