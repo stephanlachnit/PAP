@@ -2,9 +2,14 @@
 from measure import plt,np,npfarray,sqrt,pltext,curve_fit,val,c,h,sig
 
 Z = npfarray([26,42,29,22,47,40,30,28])
+
+# Literaturwerte
 sqrt_Er_lit = sqrt(13.6e-3)
 sig12_lit = 1
 p0 = npfarray([sqrt_Er_lit,sig12_lit])
+
+print()
+print(val('Literaturwer sqrt(Er)',sqrt_Er_lit))
 
 # K_alpha
 K_alpha = npfarray([6.42,17.47,8.08,4.49,21.90,15.79,8.68,7.51])
