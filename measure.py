@@ -1,4 +1,4 @@
-### measure libraby version 1.8.5
+### measure libraby version 1.8.6
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -154,7 +154,7 @@ def tbl(lists, title=''):
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def sig(name, val1, dVal1, val2, dVal2=0.0):
+def sig(name, val1, dVal1, val2, dVal2=0.0, perc=False):
   nominator = abs(val1 - val2)
   denominator = np.sqrt(dVal1**2 + dVal2**2)
   if (nominator == 0.0):
@@ -170,10 +170,14 @@ def sig(name, val1, dVal1, val2, dVal2=0.0):
     else:
       digits = 0
     sigstr = '{:.{digits}f}'.format(sigma, digits = digits)
+  percstr = ''
+  if (perc == True):
+    percval = abs(val1 - val2) / val2
+    percstr = ' ; ' + '{:.2g}'.format(percval) + '%'
   prefix = ''
   if (name != ''):
     prefix = name + ': '
-  return prefix + sigstr + 'σ'
+  return prefix + sigstr + 'σ' + percstr
 
 def chi2(yo, dyo, ye, dye=[]):
   if (dye == []):
