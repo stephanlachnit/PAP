@@ -213,9 +213,9 @@ class pltext:
   @staticmethod
   def plotdata(x, y, dy=[], dx=[], label='', color=None, connect=False):
     if (dx == []):
-      dx = [0.0 for i in range(len(x))]
+      dx = npfarray([0.0 for i in range(len(x))])
     if (dy == []):
-      dy = [0.0 for i in range(len(y))]
+      dy = npfarray([0.0 for i in range(len(y))])
     plot = plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=3, capsize=5)
     for cap in plot[1]:
       cap.set_markeredgewidth(1)
