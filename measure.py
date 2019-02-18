@@ -25,8 +25,8 @@ kB = 1.380649e-23 # Boltzmann constant
 NA = 6.02214076e23 # Avogadro constant
 T0 = 273.15 # Zero Celsius in Kelvin
 p0 = 101325 # NIST standard pressure
-g = 9.80984 # Gravitantional acceleration in Heidelberg 
-dg = 2e-5 # Uncertanty of the gravitational acceleration
+g = 9.80984 # Gravitanional acceleration in Heidelberg 
+dg = 2e-5 # Uncertainty of the gravitational acceleration
 
 def npfarray(x):
   return np.array(x, dtype='float')
@@ -55,7 +55,7 @@ def dtot(dsys, dsto):
 def signval(val, err=0.0):
   if (err == 0.0):
     return ['{:g}'.format(val), '']
-  errstr = '{:.1e}'.format(err)
+  errstr = '{:.1g}'.format(err)
   err = float(errstr)
   expdiff = int(np.floor(np.log10(abs(val))) - np.floor(np.log10(err)))
   sdigits = expdiff + 1
@@ -226,10 +226,12 @@ class pltext:
     if (label != ''):
       plt.legend()
 
-def linreg(x, y, dy, dx=[], plot=False, graphname=''):
+def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', legend=True):
+  if (fit_range == None):
+    fit_range = range(len(x))
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
-    for i in range(len(x)):
+    for i in fit_range:
       if (dy[i] == 0.0):
         dy[i] = minfloat
       s0 += dy[i]**-2
@@ -247,17 +249,17 @@ def linreg(x, y, dy, dx=[], plot=False, graphname=''):
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
-    dx = [0.0 for i in range(len(x))]
+    dx = [0.0 for i in fit_range]
     result = iter0
   else:
     g = iter0[0]
     g_old = g * (1 - 2 * linreg_change)
     while (abs(1 - g_old / g) >= linreg_change):
       g_old = g
-      dy = [np.sqrt((g * dx[i])**2 + dy[i]**2) for i in range(len(dy))]
+      dy = np.sqrt((g * dx)**2 + dy**2)
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
-  if (plot == True):
+  if (create_graph):
     [g, dg, b, db] = result
     min_x = np.argmin(x)
     max_x = np.argmax(x)
@@ -268,8 +270,7 @@ def linreg(x, y, dy, dx=[], plot=False, graphname=''):
     color = fitfunc[0].get_color()
     plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
     pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
-    if (graphname != ''):
-      plt.legend()
+    plt.legend(['fit', 'fit uncertainty'])
   return result
 
 def lin_yerr(x, dx, y, dy):
