@@ -1,4 +1,4 @@
-# measure version 1.8.5
+# measure version 1.8.6
 from measure import plt,np,npfarray,sqrt,pltext,curve_fit,val,c,h,sig
 
 Z = npfarray([26,42,29,22,47,40,30,28])
@@ -37,9 +37,9 @@ plt.plot(Z, fit_func_alpha(Z,*popt))
 print()
 print('K_alpha:')
 print(val('sqrt(Er)',sqrt_Er_alpha,Delta_sqrt_Er_alpha))
-print(sig('Abweichung',sqrt_Er_alpha,Delta_sqrt_Er_alpha,sqrt_Er_lit))
+print(sig('Abweichung',sqrt_Er_alpha,Delta_sqrt_Er_alpha,sqrt_Er_lit,perc=True))
 print(val('sig12',sig12_alpha,Delta_sig12_alpha))
-print(sig('Abweichung',sig12_alpha,Delta_sig12_alpha,sig12_lit))
+print(sig('Abweichung',sig12_alpha,Delta_sig12_alpha,sig12_lit,perc=True))
 
 # K_beta mit Ti
 
@@ -68,9 +68,9 @@ plt.plot(Z, fit_func_beta(Z,*popt))
 print()
 print('K_beta:')
 print(val('sqrt(Er)',sqrt_Er_beta,Delta_sqrt_Er_beta))
-print(sig('Abweichung',sqrt_Er_beta,Delta_sqrt_Er_beta,sqrt_Er_lit))
+print(sig('Abweichung',sqrt_Er_beta,Delta_sqrt_Er_beta,sqrt_Er_lit,perc=True))
 print(val('sig12',sig12_beta,Delta_sig12_beta))
-print(sig('Abweichung',sig12_beta,Delta_sig12_beta,sig12_lit))
+print(sig('Abweichung',sig12_beta,Delta_sig12_beta,sig12_lit,perc=True))
 
 # K_beta ohne Ti
 
@@ -95,8 +95,8 @@ plt.plot(Z_boTi, fit_func_beta(Z_boTi,*popt))
 print()
 print('K_beta (ohne Ti):')
 print(val('sqrt(Er)',sqrt_Er_boTi,Delta_sqrt_Er_boTi))
-print(sig('Abweichung',sqrt_Er_boTi,Delta_sqrt_Er_boTi,sqrt_Er_lit))
+print(sig('Abweichung',sqrt_Er_boTi,Delta_sqrt_Er_boTi,sqrt_Er_lit,perc=True))
 print(val('sig12',sig12_boTi,Delta_sig12_boTi))
-print(sig('Abweichung',sig12_boTi,Delta_sig12_boTi,sig12_lit))
+print(sig('Abweichung',sig12_boTi,Delta_sig12_boTi,sig12_lit,perc=True))
 
 plt.show()
