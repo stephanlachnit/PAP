@@ -1,4 +1,4 @@
-### measure libraby version 1.8.5
+### measure libraby version 1.8.6
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -154,7 +154,7 @@ def tbl(lists, title=''):
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def sig(name, val1, dVal1, val2, dVal2=0.0):
+def sig(name, val1, dVal1, val2, dVal2=0.0, perc=False):
   nominator = abs(val1 - val2)
   denominator = np.sqrt(dVal1**2 + dVal2**2)
   if (nominator == 0.0):
@@ -170,10 +170,14 @@ def sig(name, val1, dVal1, val2, dVal2=0.0):
     else:
       digits = 0
     sigstr = '{:.{digits}f}'.format(sigma, digits = digits)
+  percstr = ''
+  if (perc == True):
+    percval = abs(val1 - val2) / val2 * 100
+    percstr = ' ; ' + '{:.2g}'.format(percval) + '%'
   prefix = ''
   if (name != ''):
     prefix = name + ': '
-  return prefix + sigstr + 'σ'
+  return prefix + sigstr + 'σ' + percstr
 
 def chi2(yo, dyo, ye, dye=[]):
   if (dye == []):
@@ -213,9 +217,9 @@ class pltext:
   @staticmethod
   def plotdata(x, y, dy=[], dx=[], label='', color=None, connect=False):
     if (dx == []):
-      dx = [0.0 for i in range(len(x))]
+      dx = npfarray([0.0 for i in range(len(x))])
     if (dy == []):
-      dy = [0.0 for i in range(len(y))]
+      dy = npfarray([0.0 for i in range(len(y))])
     plot = plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=3, capsize=5)
     for cap in plot[1]:
       cap.set_markeredgewidth(1)
