@@ -246,7 +246,7 @@ class pltext:
     if (label != ''):
       plt.legend()
 
-def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', legend=False):
+def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=False):
   if (fit_range == None):
     fit_range = range(len(x))
   def linreg_iter(x, y, dy):
@@ -279,7 +279,7 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
       dy = np.sqrt((g * dx)**2 + dy**2)
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
-  if (create_graph):
+  if (plot):
     [g, dg, b, db] = result
     min_x = np.argmin(x)
     max_x = np.argmax(x)
@@ -294,6 +294,23 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
       plt.legend(['fit', 'fit uncertainty'])
     elif (graphname != ''):
       plt.legend()
+  return result
+
+def expreg(x,y,dy,dx=[],plot=True):
+  expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx)
+  yitc = exp(_yitc)
+  dyitc = yitc * _dyitc
+  result = [expo,dexpo,yitc,dyitc]
+  if (plot):
+    min_x = np.argmin(x)
+    max_x = np.argmax(x)
+    xint = np.linspace(x[min_x]-dx[min_x],x[max_x]+dx[max_x],1000)
+    yfit = yitc * exp(expo*xint)
+    yerr = (yitc-dyitc) * exp((expo+dexpo)*xint)
+    fitfunc = plt.plot(xint, yfit, marker='')
+    color = fitfunc[0].get_color()
+    plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
+    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, color=color)
   return result
 
 def lin_yerr(x, dx, y, dy):
