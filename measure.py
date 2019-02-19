@@ -1,4 +1,4 @@
-### measure libraby version 1.8.6
+### measure libraby version 1.8.7
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
