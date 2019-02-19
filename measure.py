@@ -215,7 +215,7 @@ class pltext:
     plt.title(title, fontsize='14')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.grid(True)
+    plt.grid(True, which='both')
     fig.set_size_inches(11.69,8.27)
     plt.tight_layout()
     if (scale == 'linlin'):
