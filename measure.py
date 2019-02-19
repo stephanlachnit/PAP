@@ -129,8 +129,7 @@ def lst(val, err=[], name=''):
       errmaxlen = len(tmp[1])
   out = []
   if (name != ''):
-    diff = valmaxlen + errmaxlen + 4
-    pos = int(np.floor(diff/2))
+    pos = int(np.floor((valmaxlen + errmaxlen + 3 + len(name))/2))
     out.append(name.rjust(pos))
   for i in range(len(val)):
     tmp = signval(val[i], err[i])
