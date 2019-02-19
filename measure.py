@@ -230,7 +230,7 @@ class pltext:
     if (label != ''):
       plt.legend()
 
-def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', legend=True):
+def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', legend=False):
   if (fit_range == None):
     fit_range = range(len(x))
   def linreg_iter(x, y, dy):
@@ -274,7 +274,10 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
     color = fitfunc[0].get_color()
     plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
     pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
-    plt.legend(['fit', 'fit uncertainty'])
+    if (legend):
+      plt.legend(['fit', 'fit uncertainty'])
+    elif (graphname != ''):
+      plt.legend()
   return result
 
 def lin_yerr(x, dx, y, dy):
