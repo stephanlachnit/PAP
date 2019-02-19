@@ -83,7 +83,18 @@ def signval(val, err=0.0):
   valstr = '{:.{digits}e}'.format(val, digits=sdigits)
   return [valstr, errstr]
 
-def val(name, val, err=0.0):
+def val(val, err=0.0, name=''):
+  """
+  Parameters
+
+  val: float
+  err: float, uncertainty of val
+  name: string, name of val
+  ----------
+  Returns
+
+  string, format: "name = val ± err" with two significant digits
+  """
   out = ''
   if (name != ''):
     out += name + ' = '
@@ -97,13 +108,13 @@ def lst(val, err=[], name=''):
   """
   Parameters
 
-  val: Array of floats with length N, which represent measured values
-  err: Array of floats with length N, which represent the errors of the corresponding values
-  name: String, which is added before the list
+  val: array of floats with length N
+  err: array of floats with length N, uncertainties of val
+  name: string, name of the list
   ----------
   Returns
 
-  Array of strings, where each string is in the form val[i] ± err[i]
+  array of strings, format "val[i] ± err[i]" with significant digits
   """
   if (err == []):
     err = [0.0 for i in range(len(val))]
@@ -118,7 +129,9 @@ def lst(val, err=[], name=''):
       errmaxlen = len(tmp[1])
   out = []
   if (name != ''):
-    out.append(name)
+    diff = valmaxlen + errmaxlen + 4
+    pos = int(np.floor(diff/2))
+    out.append(name.rjust(pos))
   for i in range(len(val)):
     tmp = signval(val[i], err[i])
     tmp2 =  tmp[0].ljust(valmaxlen)
@@ -129,22 +142,22 @@ def lst(val, err=[], name=''):
     out.append(tmp2)
   return out
 
-def tbl(lists, title=''):
+def tbl(lists, name=''):
   """
   Parameters
 
-  lists: Array of rowarrays with length N, which should be arrays with length M of the column strings.
-  title: String, which is added before the table
+  lists: array of rowarrays with length N, which should be arrays with length M of the column strings
+  name: string, which is added before the table
   ----------
   Returns
 
-  String of the MxN array.
+  string of the MxN array
   """
   M = len(lists[0])
   N = len(lists)
   out = ''
-  if (title != ''):
-    out += title + ':\n'
+  if (name != ''):
+    out += name + ':\n'
   lens = [int(npfarray([len(lists[i][j]) for j in range(M)]).max()) for i in range(N)]
   for j in range(M):
     for i in range(N):
@@ -154,9 +167,13 @@ def tbl(lists, title=''):
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def sig(name, val1, dVal1, val2, dVal2=0.0, perc=False):
+def sig(name, val1, err1, val2, err2=None, perc=False):
+  if (err2 == None):
+    err2 = 0 * val2
   nominator = abs(val1 - val2)
-  denominator = np.sqrt(dVal1**2 + dVal2**2)
+  denominator = np.sqrt(err1**2 + err2**2)
+  if type(nominator) is np.ndarray:
+    return 'todo' # TODO
   if (nominator == 0.0):
     sigstr = '0'
   elif (denominator == 0.0):
