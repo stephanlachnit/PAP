@@ -15,6 +15,8 @@ log10 = np.log10
 sin = np.sin
 cos = np.cos
 tan = np.tan
+arcsin = np.arcsin
+arccos = np.arccos
 arctan = np.arctan
 pi = np.pi
 euler_e = np.e
@@ -253,7 +255,7 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
-    dx = [0.0 for i in fit_range]
+    dx = [0.0 for i in range(len(x))]
     result = iter0
   else:
     g = iter0[0]
@@ -274,7 +276,7 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
     color = fitfunc[0].get_color()
     plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
     pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
-    plt.legend(['fit', 'fit uncertainty'])
+    plt.legend(['Fit', 'Fit uncertainty'])
   return result
 
 def lin_yerr(x, dx, y, dy):
