@@ -1,5 +1,5 @@
 # measure version 1.8.7
-from measure import npfarray,sqrt,ln,lst,tbl,sig,val,mv,dsto_mv,dsys_mv,dtot_mv,plt,pltext,expreg,pi
+from measure import npfarray,sqrt,ln,exp,lst,tbl,sig,val,mv,dsto_mv,dsys_mv,dtot_mv,plt,pltext,expreg,pi
 
 # Aufgabe 1
 R_A1 = npfarray([1,10,1])*1e3
@@ -158,6 +158,21 @@ f_R_g_dsys = 0.05e3
 print()
 print('Aufgabe 7:\n')
 print(tbl([ lst([f_R_g],[f_R_g_dsys],'f_R (g)'), lst([f_R_b[2]],[f_R_b_dtot[2]],'f_R (b)'), ['Abw',sig('',f_R_g,f_R_g_dsys,f_R_b[2],f_R_b_dtot[2])] ]))
+
+# Aufgabe 8
+def V(dbV):
+  return 10**(dbV/20)
+
+dbV_vals = npfarray([[-2.8,-10.9,-20.0],[-32.3,-13.6,-20.8],[-2.8,-14.7,-27.8],[-2.7,8.3,-30.5],[-32.2,-11.3,-23.8]])
+V_vals = V(dbV_vals)
+
+perc = [V_vals[i][1] / V_vals[0][1] for i in range(1,5)]
+
+print()
+print('Aufgabe 8:\n')
+print(V_vals)
+print()
+print(perc)
 
 # Plot
 print()
