@@ -1,4 +1,6 @@
 ﻿/__pycache__
+/ext
+/sigval.so
 
 # test file to play around
 /test.py
