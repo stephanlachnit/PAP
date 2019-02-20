@@ -33,26 +33,86 @@ dg = 2e-5 # Uncertainty of the gravitational acceleration
 def npfarray(x):
   return np.array(x, dtype='float')
 
-def mv(x):
+def mv(val):
+  """
+  Parameters
+
+  val: array of floats
+  ----------
+  Returns
+
+  float, mean value of val
+  """
   s = 0.0
-  for i in range(len(x)):
-    s += x[i]
-  return s / len(x)
+  for i in range(len(val)):
+    s += val[i]
+  return s / len(val)
 
-def dsto(x):
+def dsto(val):
+  """
+  Parameters
+
+  val: array of floats
+  ----------
+  Returns
+
+  float, standard devation (dof = N-1)
+  """
   s = 0.0
-  for i in range(len(x)):
-    s += (x[i] - mv(x))**2
-  return sqrt(s / (len(x) - 1))
+  _mv = mv(val)
+  for i in range(len(val)):
+    s += (val[i] - _mv)**2
+  return sqrt(s / (len(val) - 1))
 
-def dsto_mv(x):
-  return dsto(x) / sqrt(len(x))
+def dsto_mv(val):
+  """
+  Parameters
 
-def dsys_mv(x):
-  return sqrt(np.sum(x**2)) / len(x)
+  val: array of floats
+  ----------
+  Returns
+
+  float, standard devation of the mean value (dof = N-1)
+  """
+  return dsto(val) / sqrt(len(val))
+
+def dsys_mv(err):
+  """
+  Parameters
+
+  err: array of floats; systematic errors
+  ----------
+  Returns
+
+  float; systematic error of the mean value
+  """
+  return sqrt(np.sum(err**2)) / len(err)
 
 def dtot(dsys, dsto):
+  """
+  Parameters
+
+  dsys: float; systematic error
+  dsto: float; stochastic error
+  ----------
+  Returns
+
+  float; total error
+  """
   return sqrt(dsys**2 + dsto**2)
+
+def dtot_mv(val, err):
+  """
+  Parameters
+
+  val: array of floats
+  err: array of floats; systematic errors
+  ----------
+  Returns
+
+  float; total error of the mean value
+  """
+  return dtot(dsys_mv(err),dsto_mv(val))
 
 def signval(val, err=0.0):
   if (err == 0.0):
