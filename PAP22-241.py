@@ -106,7 +106,7 @@ T_mv_dtot = dtot_mv(T,T_dsys)
 t = npfarray([n*T_mv for n in range(0,5)])
 dt = npfarray([T_mv_dtot for n in range(0,5)])
 
-pltext.initplot(num=2,title='Abbildung   : Bestimmung der Dämpfungskonstante',scale='linlog')
+pltext.initplot(num=2,title='Abbildung   : Bestimmung der Dämpfungskonstante',xlabel='Zeit in s',ylabel='Amplitude in V',scale='linlog')
 dc,dc_dsys,yitc,dyitc = expreg(t,A,A_dsys,dt,plot=True)
 dc *= -1
 
@@ -176,4 +176,4 @@ print(perc)
 
 # Plot
 print()
-#plt.show()
+plt.show()
