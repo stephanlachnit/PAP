@@ -57,7 +57,7 @@ def dtot(dsys, dsto):
 def signval(val, err=0.0):
   if (err == 0.0):
     return ['{:g}'.format(val), '']
-  errstr = '{:.1g}'.format(err)
+  errstr = '{:.1e}'.format(err)
   err = float(errstr)
   expdiff = int(np.floor(np.log10(abs(val))) - np.floor(np.log10(err)))
   sdigits = expdiff + 1
