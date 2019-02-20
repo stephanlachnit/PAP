@@ -26,8 +26,33 @@ dt_dsys = npfarray([20,5,5,5,3.0,2.5,2.5,2.0,1.5,1.5,1.0])*1e-6
 Phi = 2*pi * f * dt
 Phi_dsys = 2*pi * f * dt_dsys
 
-pltext.initplot(num=1,title='Phase',scale='loglin')
-pltext.plotdata(f,Phi,Phi_dsys)
+pltext.initplot(num=1,title='Abbildung   : Phase in Abhängigkeit der Frequenz',xlabel='Frequenz in Hz',ylabel='Phase in rad',scale='loglin')
+pltext.plotdata(f,Phi,Phi_dsys,label='gemessene Phase')
+plt.plot([1e3,10e3],[pi/4,pi/4],label='45°')
+plt.legend()
+
+R_A3 = 1e3
+R_A3_dsys = 0.05 * R_A3
+C_A3 = 47e-9
+C_A3_dsys = 0.05 * C_A3
+
+fgr_phase = 3400
+fgr_phase_dsys = 300
+fgr_fgang = npfarray([3.16,3.58])*1e3
+fgr_fgang_dsys = npfarray([0.15,0.15])*1e3
+fgr_fgang_mv = mv(fgr_fgang)
+fgr_fgang_dtot = dtot(dsys_mv(fgr_fgang_dsys),dsto_mv(fgr_fgang))
+fgr_calc = 1/(2*pi * R_A3 * C_A3)
+fgr_calc_dsys = 1/(2*pi * R_A3 * C_A3) * sqrt((R_A3_dsys/R_A3)**2 + (C_A3_dsys/C_A3)**2)
+
+print()
+print('Aufgabe 3:')
+print(tbl([['','bei 45° Phase','Frequenzgang','berechnet'],lst([fgr_phase,fgr_fgang_mv,fgr_calc],[fgr_phase_dsys,fgr_fgang_dtot,fgr_calc_dsys],'f_gr in Hz')]))
+print(sig('Phase/Fgang',fgr_phase,fgr_phase_dsys,fgr_fgang_mv,fgr_fgang_dtot))
+print(sig('Phase/calc ',fgr_phase,fgr_phase_dsys,fgr_calc,fgr_calc_dsys))
+print(sig('Fgang/calc ',fgr_fgang_mv,fgr_fgang_dtot,fgr_calc,fgr_calc_dsys))
+
+# Aufgabe 4
 
 
 # Aufgabe 5
@@ -41,7 +66,7 @@ T_mv_dtot = dtot(dsys_mv(T_dsys),dsto_mv(T))
 t = npfarray([n*T_mv for n in range(0,5)])
 dt = npfarray([T_mv_dtot for n in range(0,5)])
 
-pltext.initplot(num=2,title='Dämpfung',scale='linlog')
+pltext.initplot(num=2,title='Abbildung   : Bestimmung der Dämpfungskonstante',scale='linlog')
 dc,dc_dsys,yitc,dyitc = expreg(t,A,A_dsys,dt,plot=True)
 
 L = L_dsys = 1
@@ -55,4 +80,4 @@ print(val(R_ges,R_ges_dsys,'R'))
 
 # Plot
 print()
-plt.show()
+#plt.show()
