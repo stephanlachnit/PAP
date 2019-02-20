@@ -1,4 +1,4 @@
-### measure libraby version 1.8.6
+### measure libraby version 1.8.7
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -15,6 +15,8 @@ log10 = np.log10
 sin = np.sin
 cos = np.cos
 tan = np.tan
+arcsin = np.arcsin
+arccos = np.arccos
 arctan = np.arctan
 pi = np.pi
 euler_e = np.e
@@ -83,7 +85,18 @@ def signval(val, err=0.0):
   valstr = '{:.{digits}e}'.format(val, digits=sdigits)
   return [valstr, errstr]
 
-def val(name, val, err=0.0):
+def val(val, err=0.0, name=''):
+  """
+  Parameters
+
+  val: float
+  err: float, uncertainty of val
+  name: string, name of val
+  ----------
+  Returns
+
+  string, format: "name = val ± err" with two significant digits
+  """
   out = ''
   if (name != ''):
     out += name + ' = '
@@ -97,13 +110,13 @@ def lst(val, err=[], name=''):
   """
   Parameters
 
-  val: Array of floats with length N, which represent measured values
-  err: Array of floats with length N, which represent the errors of the corresponding values
-  name: String, which is added before the list
+  val: array of floats with length N
+  err: array of floats with length N, uncertainties of val
+  name: string, name of the list
   ----------
   Returns
 
-  Array of strings, where each string is in the form val[i] ± err[i]
+  array of strings, format "val[i] ± err[i]" with significant digits
   """
   if (err == []):
     err = [0.0 for i in range(len(val))]
@@ -118,7 +131,8 @@ def lst(val, err=[], name=''):
       errmaxlen = len(tmp[1])
   out = []
   if (name != ''):
-    out.append(name)
+    pos = int(np.floor((valmaxlen + errmaxlen + 3 + len(name))/2))
+    out.append(name.rjust(pos))
   for i in range(len(val)):
     tmp = signval(val[i], err[i])
     tmp2 =  tmp[0].ljust(valmaxlen)
@@ -129,22 +143,22 @@ def lst(val, err=[], name=''):
     out.append(tmp2)
   return out
 
-def tbl(lists, title=''):
+def tbl(lists, name=''):
   """
   Parameters
 
-  lists: Array of rowarrays with length N, which should be arrays with length M of the column strings.
-  title: String, which is added before the table
+  lists: array of rowarrays with length N, which should be arrays with length M of the column strings
+  name: string, which is added before the table
   ----------
   Returns
 
-  String of the MxN array.
+  string of the MxN array
   """
   M = len(lists[0])
   N = len(lists)
   out = ''
-  if (title != ''):
-    out += title + ':\n'
+  if (name != ''):
+    out += name + ':\n'
   lens = [int(npfarray([len(lists[i][j]) for j in range(M)]).max()) for i in range(N)]
   for j in range(M):
     for i in range(N):
@@ -154,9 +168,13 @@ def tbl(lists, title=''):
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def sig(name, val1, dVal1, val2, dVal2=0.0, perc=False):
+def sig(name, val1, err1, val2, err2=None, perc=False):
+  if (err2 == None):
+    err2 = 0 * val2
   nominator = abs(val1 - val2)
-  denominator = np.sqrt(dVal1**2 + dVal2**2)
+  denominator = np.sqrt(err1**2 + err2**2)
+  if type(nominator) is np.ndarray:
+    return 'todo' # TODO
   if (nominator == 0.0):
     sigstr = '0'
   elif (denominator == 0.0):
@@ -199,7 +217,7 @@ class pltext:
     plt.title(title, fontsize='14')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.grid(True)
+    plt.grid(True, which='both')
     fig.set_size_inches(11.69,8.27)
     plt.tight_layout()
     if (scale == 'linlin'):
@@ -230,7 +248,7 @@ class pltext:
     if (label != ''):
       plt.legend()
 
-def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', legend=True):
+def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=False):
   if (fit_range == None):
     fit_range = range(len(x))
   def linreg_iter(x, y, dy):
@@ -253,7 +271,7 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
-    dx = [0.0 for i in fit_range]
+    dx = [0.0 for i in range(len(x))]
     result = iter0
   else:
     g = iter0[0]
@@ -263,7 +281,7 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
       dy = np.sqrt((g * dx)**2 + dy**2)
       g = linreg_iter(x, y, dy)[0]
     result = linreg_iter(x, y, dy)
-  if (create_graph):
+  if (plot):
     [g, dg, b, db] = result
     min_x = np.argmin(x)
     max_x = np.argmax(x)
@@ -274,7 +292,27 @@ def linreg(x, y, dy, dx=[], fit_range=None, create_graph=False, graphname='', le
     color = fitfunc[0].get_color()
     plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
     pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
-    plt.legend(['fit', 'fit uncertainty'])
+    if (legend):
+      plt.legend(['Fit', 'Fit uncertainty'])
+    elif (graphname != ''):
+      plt.legend()
+  return result
+
+def expreg(x,y,dy,dx=[],plot=True):
+  expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx)
+  yitc = exp(_yitc)
+  dyitc = yitc * _dyitc
+  result = [expo,dexpo,yitc,dyitc]
+  if (plot):
+    min_x = np.argmin(x)
+    max_x = np.argmax(x)
+    xint = np.linspace(x[min_x]-dx[min_x],x[max_x]+dx[max_x],1000)
+    yfit = yitc * exp(expo*xint)
+    yerr = (yitc-dyitc) * exp((expo+dexpo)*xint)
+    fitfunc = plt.plot(xint, yfit, marker='')
+    color = fitfunc[0].get_color()
+    plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
+    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, color=color)
   return result
 
 def lin_yerr(x, dx, y, dy):

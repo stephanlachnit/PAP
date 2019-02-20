@@ -1,5 +1,5 @@
 import measure as ms
-from measure import pi, sqrt, arctan
+from measure import pi, sqrt, arcsin, arccos, arctan
 from measure import npfarray as npf
 import numpy as np
 import scipy.constants as sc
@@ -128,15 +128,28 @@ B6_h = U6_i / (2 * pi * n_i * A_i * f6)
 d_B6_h = B6_h * sqrt((d_U6_i / U6_i)**2 + (d_f6 / f6)**2)
 α = arctan(B6_v / B6_h)
 d_α = B6_v * B6_h / (B6_v**2 + B6_h**2) * sqrt((d_B6_v / B6_v)**2 + (d_B6_h / B6_h)**2)
+α2 = arcsin(B6_v / B5)
+d_α2 = B6_v / sqrt(B5**2 - B6_v**2) * sqrt((d_B6_v / B6_v)**2 + (d_B5 / B5)**2)
+α3 = arccos(B6_h / B5)
+d_α3 = B6_h / sqrt(B5**2 - B6_h**2) * sqrt((d_B6_h / B6_h)**2 + (d_B5 / B5)**2)
 
 α /= sc.degree
 d_α /= sc.degree
+α2 /= sc.degree
+d_α2 /= sc.degree
+α3 /= sc.degree
+d_α3 /= sc.degree
 
-print(sqrt(B6_v**2 + B6_h**2))
+print(ms.val("B5'", sqrt(B6_v**2 + B6_h**2)))
 
 print(ms.val("B6_v", B6_v, d_B6_v))
 print(ms.val("B6_h", B6_h, d_B6_h))
 print(ms.val("α", α, d_α))
+print(ms.val("α2", α2, d_α2))
+print(ms.val("α3", α3, d_α3))
+print(ms.sig("α", α, d_α, 66))
+print(ms.sig("α2", α2, d_α2, 66))
+print(ms.sig("α3", α3, d_α3, 66))
 print()
 
 #ms.plt.show()
