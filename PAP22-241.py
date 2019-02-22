@@ -1,5 +1,5 @@
 # measure version 1.8.7
-from measure import npfarray,sqrt,ln,exp,lst,tbl,sig,val,mv,dsto_mv,dsys_mv,dtot_mv,plt,pltext,expreg,pi
+from measure import npfarray,sqrt,ln,exp,arctan,lst,tbl,sig,val,mv,dsto_mv,dsys_mv,dtot_mv,plt,pltext,expreg,pi,curve_fit
 
 # Aufgabe 1
 R_A1 = npfarray([1,10,1])*1e3
@@ -20,30 +20,46 @@ print(tbl([lst(R_A1,R_A1_dsys,'R'),lst(C_A1,C_A1_dsys,'C'),lst(tau,tau_dsys,'Tau
 print(tbl([lst(b_thalb,b_thalb_dsys,'T_1/2 (b)'),lst(g_thalb,g_thalb_dsys,'T_1/2 (g)'),['Abw']+[sig('',b_thalb[i],b_thalb_dsys[i],g_thalb[i],g_thalb_dsys[i]) for i in range(len(b_thalb))]]))
 
 # Aufgabe 3
-f = npfarray([1,2,3,3.58,4,5,6,7,8,9,10])*1e3
-dt = npfarray([200,83,46,30,27.2,18.8,14.0,10.4,8.0,6.8,4.1])*1e-6
-dt_dsys = npfarray([20,5,5,5,3.0,2.5,2.5,2.0,1.5,1.5,1.0])*1e-6
-Phi = 2*pi * f * dt
-Phi_dsys = 2*pi * f * dt_dsys
-
-pltext.initplot(num=1,title='Abbildung   : Phase in Abhängigkeit der Frequenz',xlabel='Frequenz in Hz',ylabel='Phase in rad',scale='loglin')
-pltext.plotdata(f,Phi,Phi_dsys,label='gemessene Phase')
-plt.plot([1e3,10e3],[pi/4,pi/4],label='45°')
-plt.legend()
-
 R_A3 = 1e3
 R_A3_dsys = 0.05 * R_A3
 C_A3 = 47e-9
 C_A3_dsys = 0.05 * C_A3
 
-fgr_phase = 3400
-fgr_phase_dsys = 300
+f_A3 = npfarray([1,2,3,3.58,4,5,6,7,8,9,10])*1e3
+dt = npfarray([200,83,46,30,27.2,18.8,14.0,10.4,8.0,6.8,4.1])*1e-6
+dt_dsys = npfarray([20,5,5,5,3.0,2.5,2.5,2.0,1.5,1.5,1.0])*1e-6
+Phi = 2*pi * f_A3 * dt
+Phi_dsys = 2*pi * f_A3 * dt_dsys
+
+from numpy import linspace
+from scipy.optimize import fsolve
+
+def phase_b(f):
+  return arctan(1/(2*pi*f*R_A3*C_A3))
+def phase_b_dys(f):
+  return arctan(1/(2*pi*f*(R_A3+R_A3_dsys)*(C_A3+C_A3_dsys)))
+def phase_b_45deg(f):
+  return phase_b(f) - pi/4
+def phase_b_45deg_dsys(f):
+  return phase_b_dys(f) - pi/4
+
+fgr_phase = fsolve(phase_b_45deg,x0=3.4e3)[0]
+fgr_phase_dsys = abs(fsolve(phase_b_45deg_dsys,x0=0.3e3)[0] - fgr_phase)
 fgr_fgang = npfarray([3.16,3.58])*1e3
 fgr_fgang_dsys = npfarray([0.15,0.15])*1e3
 fgr_fgang_mv = mv(fgr_fgang)
 fgr_fgang_mv_dtot = dtot_mv(fgr_fgang,fgr_fgang_dsys)
 fgr_calc = 1/(2*pi * R_A3 * C_A3)
 fgr_calc_dsys = 1/(2*pi * R_A3 * C_A3) * sqrt((R_A3_dsys/R_A3)**2 + (C_A3_dsys/C_A3)**2)
+
+f_array = linspace(1e3,10e3,1000)
+
+pltext.initplot(num=1,title='Abbildung   : Phase in Abhängigkeit der Frequenz',xlabel='Frequenz in Hz',ylabel='Phase in rad',scale='loglin')
+pltext.plotdata(f_A3,Phi,Phi_dsys,label='gemessene Phase')
+plt.plot([1e3,10e3],[pi/4,pi/4],label='45°')
+plt.plot(f_array,phase_b(f_array),label='berechnet')
+plt.plot(f_array,phase_b_dys(f_array),label='berechnet, Fehler')
+plt.legend()
 
 print()
 print('Aufgabe 3:\n')
@@ -166,13 +182,17 @@ def V(dbV):
 dbV_vals = npfarray([[-2.8,-10.9,-20.0],[-32.3,-13.6,-20.8],[-2.8,-14.7,-27.8],[-2.7,8.3,-30.5],[-32.2,-11.3,-23.8]])
 V_vals = V(dbV_vals)
 
-perc = [V_vals[i][1] / V_vals[0][1] for i in range(1,5)]
+perc_100 = [V_vals[i][0] / V_vals[0][0] for i in range(1,5)]
+perc_4k = [V_vals[i][1] / V_vals[0][1] for i in range(1,5)]
+perc_8k = [V_vals[i][2] / V_vals[0][2] for i in range(1,5)]
 
 print()
 print('Aufgabe 8:\n')
-print(V_vals)
+print('Spannungen in Volt')
+print(tbl([ ['Signal','ohne Filter','RC-Hochpass','RC-Tiefpass','LC-Tiefpass','Bandpass 1k'], lst(V_vals[:,0],name='100Hz'), lst(V_vals[:,1],name='4kHz'), lst(V_vals[:,2],name='8kHz') ]))
 print()
-print(perc)
+print('Verhältnis zum Signal ohne Filter')
+print(tbl([ ['Signal','RC-Hochpass','RC-Tiefpass','LC-Tiefpass','Bandpass 1k'], lst(perc_100,name='100Hz'), lst(perc_4k,name='4kHz'), lst(perc_8k,name='8kHz') ]))
 
 # Plot
 print()
