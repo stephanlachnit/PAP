@@ -108,7 +108,7 @@ print()
 print('Aufgabe 4:\n')
 print(val(L_A4_mv,L_A4_mv_dtot,'Induktivität L'))
 print()
-print(tbl([lst(R_A4,R_A4_dsys,'R'),lst(R_ges_A4,R_ges_A4_dsys,'R_ges'),lst(R_V_df_A4,R_V_df_A4_dsys,'R_V (df)'),lst(R_V_U_A4,R_V_U_A4_dsys,'R_V (U)')]))
+print(tbl([lst(R_A4,R_A4_dsys,'R'),lst(R_ges_A4,R_ges_A4_dsys,'R_ges (df)'),lst(R_V_df_A4,R_V_df_A4_dsys,'R_V (df)'),lst(R_V_U_A4,R_V_U_A4_dsys,'R_V (U)')]))
 print(tbl([lst([R_V_df_A4_mv],[R_V_df_A4_mv_dtot],'mv(R_V) (df)'),lst([R_V_U_A4_mv],[R_V_U_A4_mv_dtot],'mv(R_V) (U)'),['Abw']+[sig('',R_V_df_A4_mv,R_V_df_A4_mv_dtot,R_V_U_A4_mv,R_V_U_A4_mv_dtot)]]))
 
 # Aufgabe 5
@@ -157,7 +157,7 @@ delta_dtot = 1/(2 * L_A4_mv) * sqrt(R_A6_dsys**2 + (R_A6 * L_A4_mv_dtot / L_A4_m
 f_R_b[0] = sqrt(wr**2 - 2 * delta**2)
 f_R_b_dtot[0] = 1/f_R_b[0] * sqrt((wr * wr_dtot)**2 + (2 * delta * delta_dtot)**2)
 f_R_b[1] = sqrt(wr**2 + 2 * delta**2)
-f_R_b_dtot[1] = f_R_b_dtot[0]
+f_R_b_dtot[1] = 1/f_R_b[1] * sqrt((wr * wr_dtot)**2 + (2 * delta * delta_dtot)**2)
 f_R_b[2] = wr
 f_R_b_dtot[2] = wr_dtot
 f_R_b /= 2*pi
@@ -191,7 +191,7 @@ print('Aufgabe 8:\n')
 print('Spannungen in Volt')
 print(tbl([ ['Signal','ohne Filter','RC-Hochpass','RC-Tiefpass','LC-Tiefpass','Bandpass 1k'], lst(V_vals[:,0],name='100Hz'), lst(V_vals[:,1],name='4kHz'), lst(V_vals[:,2],name='8kHz') ]))
 print()
-print('Verhältnis zum Signal ohne Filter')
+print('Verhältnis zum ungefilterten Signal')
 print(tbl([ ['Signal','RC-Hochpass','RC-Tiefpass','LC-Tiefpass','Bandpass 1k'], lst(perc_100,name='100Hz'), lst(perc_4k,name='4kHz'), lst(perc_8k,name='8kHz') ]))
 
 # Plot
