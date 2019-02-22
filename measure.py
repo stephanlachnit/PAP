@@ -298,7 +298,7 @@ class pltext:
       dx = npfarray([0.0 for i in range(len(x))])
     if (dy == []):
       dy = npfarray([0.0 for i in range(len(y))])
-    plot = plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=3, capsize=5)
+    plot = plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=2, capsize=3)
     if (connect == True):
       if (color == None):
         color = plot[0].get_color()
