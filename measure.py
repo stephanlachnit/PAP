@@ -1,4 +1,4 @@
-### measure libraby version 1.8.7
+### measure libraby version 1.8.8s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -37,42 +37,39 @@ def mv(val):
   """
   Parameters
 
-  val: array of floats
+  val: npfarray;
   ----------
   Returns
 
-  float, mean value of val
+  float; mean value of val;
   """
-  s = 0.0
-  for i in range(len(val)):
-    s += val[i]
+  s = np.sum(val)
   return s / len(val)
 
 def dsto(val):
   """
   Parameters
 
-  val: array of floats
+  val: npfarray;
   ----------
   Returns
 
-  float, standard devation (dof = N-1)
+  float; standard devation (dof = N-1);
   """
-  s = 0.0
+  
   _mv = mv(val)
-  for i in range(len(val)):
-    s += (val[i] - _mv)**2
+  s = np.sum((val - _mv)**2)
   return sqrt(s / (len(val) - 1))
 
 def dsto_mv(val):
   """
   Parameters
 
-  val: array of floats
+  val: npfarray;
   ----------
   Returns
 
-  float, standard devation of the mean value (dof = N-1)
+  float; standard devation of the mean value (dof = N-1);
   """
   return dsto(val) / sqrt(len(val))
 
@@ -80,11 +77,11 @@ def dsys_mv(err):
   """
   Parameters
 
-  err: array of floats; systematic errors
+  err: npfarray; systematic errors;
   ----------
   Returns
 
-  float; systematic error of the mean value
+  float; systematic error of the mean value;
   """
   return sqrt(np.sum(err**2)) / len(err)
 
@@ -92,12 +89,12 @@ def dtot(dsys, dsto):
   """
   Parameters
 
-  dsys: float; systematic error
-  dsto: float; stochastic error
+  dsys: float; systematic error;
+  dsto: float; stochastic error;
   ----------
   Returns
 
-  float; total error
+  float; total error;
   """
   return sqrt(dsys**2 + dsto**2)
 
@@ -105,12 +102,12 @@ def dtot_mv(val, err):
   """
   Parameters
 
-  val: array of floats
-  err: array of floats; systematic errors
+  val: npfarray;
+  err: npfarray; systematic errors;
   ----------
   Returns
 
-  float; total error of the mean value
+  float; total error of the mean value;
   """
   return dtot(dsys_mv(err),dsto_mv(val))
 
@@ -149,13 +146,13 @@ def val(val, err=0.0, name=''):
   """
   Parameters
 
-  val: float
-  err: float, uncertainty of val
-  name: string, name of val
+  val: float;
+  err: float; uncertainty of val;
+  name: string; name of val;
   ----------
   Returns
 
-  string, format: "name = val ± err" with two significant digits
+  string; format: "name = val ± err" with two significant digits;
   """
   out = ''
   if (name != ''):
@@ -170,32 +167,41 @@ def lst(val, err=[], name=''):
   """
   Parameters
 
-  val: array of floats with length N
-  err: array of floats with length N, uncertainties of val
-  name: string, name of the list
+  val: npfarray;
+  err: npfarray; uncertainties of val;
+  name: string; name of the list;
   ----------
   Returns
 
-  array of strings, format "val[i] ± err[i]" with significant digits
+  array of strings; format "val[i] ± err[i]" with two significant digits, name is the first item;
   """
   if (err == []):
     err = [0.0 for i in range(len(val))]
   N = len(val)
   valmaxlen = 0
   errmaxlen = 0
+  hasneg = False
   for i in range(N):
     tmp = signval(val[i], err[i])
     if (len(tmp[0]) > valmaxlen):
       valmaxlen = len(tmp[0])
     if (len(tmp[1]) > errmaxlen):
       errmaxlen = len(tmp[1])
+    if (float(tmp[0]) < 0):
+      hasneg = True
   out = []
   if (name != ''):
-    pos = int(np.floor((valmaxlen + errmaxlen + 3 + len(name))/2))
-    out.append(name.rjust(pos))
+    erraddlen = 0
+    if (errmaxlen != 0):
+      erraddlen = 3
+    adjust = int(np.floor((valmaxlen + errmaxlen + erraddlen + len(name))/2))
+    out.append(name.rjust(adjust))
   for i in range(len(val)):
     tmp = signval(val[i], err[i])
-    tmp2 =  tmp[0].ljust(valmaxlen)
+    if hasneg:
+      if (float(tmp[0]) >= 0):
+        tmp[0] = '+' + tmp[0]
+    tmp2 = tmp[0].ljust(valmaxlen)
     if (tmp[1] != ''):
       tmp2 += ' ± ' + tmp[1].ljust(errmaxlen)
     elif (errmaxlen != 0):
@@ -203,59 +209,100 @@ def lst(val, err=[], name=''):
     out.append(tmp2)
   return out
 
-def tbl(lists, name=''):
+def tbl(lists):
   """
   Parameters
 
-  lists: array of rowarrays with length N, which should be arrays with length M of the column strings
-  name: string, which is added before the table
+  lists: array of arrays of strings; each list (stringarray) will turn into a column;
   ----------
   Returns
 
-  string of the MxN array
+  string; format: table;
   """
   M = len(lists[0])
   N = len(lists)
   out = ''
-  if (name != ''):
-    out += name + ':\n'
   lens = [int(npfarray([len(lists[i][j]) for j in range(M)]).max()) for i in range(N)]
   for j in range(M):
     for i in range(N):
       suffix = ' | '
       if (i == N-1):
-        suffix = '\n' 
+        suffix = '\n'
+        if (j == M-1):
+          suffix = ''
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def sig(name, val1, err1, val2, err2=None, perc=False):
-  if (err2 == None):
-    err2 = 0 * val2
+def sig(name, val1, err1, val2, err2=0.0, perc=False):
+  ### deprecated, use dev instead, will be removed in 1.8.9s
+  return dev(val1,err1,val2,err2,name=name,perc=perc)
+
+def dev(val1,err1,val2,err2=0.0,name='',perc=False):
+  def get_sig(nominator,denominator):
+    if (nominator == 0.0):
+      sigstr = '0'
+    elif (denominator == 0.0):
+      sigstr = '∞ '
+    else:
+      sigma = nominator / denominator
+      if (sigma < 0.95):
+        digits = int(abs(np.floor(np.log10(sigma))))
+      elif (sigma < 3.95):
+        digits = 1
+      else:
+        digits = 0
+      sigstr = '{:.{digits}f}'.format(sigma,digits=digits)
+    sigstr += 'σ'
+    return sigstr
+
+  def get_perc(val1,val2,pformat='{:.2f}'):
+    percval = abs(val1 - val2) / val2 * 100
+    percstr = pformat.format(percval) + '%'
+    return percstr
+
+  out = None
   nominator = abs(val1 - val2)
   denominator = np.sqrt(err1**2 + err2**2)
-  if type(nominator) is np.ndarray:
-    return 'todo' # TODO
-  if (nominator == 0.0):
-    sigstr = '0'
-  elif (denominator == 0.0):
-    sigstr = '∞'
-  else:
-    sigma = nominator / denominator
-    if (sigma < 0.95):
-      digits = int(abs(np.floor(np.log10(sigma))))
-    elif (sigma < 3.95):
-      digits = 1
+  if type(val1) is np.ndarray:
+    out = []
+    N = len(val1)
+    if type(denominator) is not np.ndarray:
+      denominator = npfarray([denominator for i in range(N)])
+    if perc:
+      if type(val2) is not np.ndarray:
+        val2 = npfarray([val2 for i in range(N)])
+      tmp = []
+      tmp2 = []
+      sigmaxlen = 0
+      percmaxlen = 0
+      for i in range(N):
+        tmp.append(get_sig(nominator[i],denominator[i]))
+        siglen = len(tmp[i])
+        if (siglen > sigmaxlen):
+          sigmaxlen = siglen
+        tmp2.append(get_perc(val1[i],val2[i]))
+        perclen = len(tmp2[i])
+        if (perclen > percmaxlen):
+          percmaxlen = perclen
+      if (name != ''):
+        adjust = int(np.floor((sigmaxlen/2 + 2 + len(name))))
+        out.append(name.rjust(adjust))
+      for i in range(N):
+        out.append(tmp[i].rjust(sigmaxlen) + ' | ' + tmp2[i].rjust(percmaxlen))
     else:
-      digits = 0
-    sigstr = '{:.{digits}f}'.format(sigma, digits = digits)
-  percstr = ''
-  if (perc == True):
-    percval = abs(val1 - val2) / val2 * 100
-    percstr = ' ; ' + '{:.2g}'.format(percval) + '%'
-  prefix = ''
-  if (name != ''):
-    prefix = name + ': '
-  return prefix + sigstr + 'σ' + percstr
+      if (name != ''):
+        out.append(name)
+      for i in range(N):
+        out.append(get_sig(nominator[i],denominator[i]))
+  else:
+    out = ''
+    prefix = ''
+    if (name != ''):
+      prefix = name + ': '
+    out += prefix + get_sig(nominator,denominator)
+    if perc:
+      out += ' ; ' + get_perc(val1,val2,pformat='{:.2g}')
+  return out
 
 def chi2(yo, dyo, ye, dye=[]):
   if (dye == []):
@@ -272,14 +319,14 @@ def chi2_red(yo, dyo, ye, dye=[], dof=0):
 
 class pltext:
   @staticmethod
-  def initplot(num=0, title='', xlabel='', ylabel='', scale='linlin'):
+  def initplot(num=0,title='',xlabel='',ylabel='',scale='linlin',papertype='A4'):
     fig = plt.figure(num)
     plt.title(title, fontsize='14')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True, which='both')
-    fig.set_size_inches(11.69,8.27)
-    plt.tight_layout()
+    if (papertype == 'A4'):
+      fig.set_size_inches(11.69,8.27)
     if (scale == 'linlin'):
       plt.ticklabel_format(style='sci', axis='both', scilimits=(-2,3))
     elif (scale == 'linlog'):
@@ -293,18 +340,29 @@ class pltext:
       plt.xscale('log')
 
   @staticmethod
-  def plotdata(x, y, dy=[], dx=[], label='', color=None, connect=False):
+  def plotdata(x,y,dy=[],dx=[],label='',caps=True,connect=False,color=None):
     if (dx == []):
-      dx = npfarray([0.0 for i in range(len(x))])
+      dx = 0.0
     if (dy == []):
-      dy = npfarray([0.0 for i in range(len(y))])
-    plot = plt.errorbar(x=x, y=y, yerr=dy, xerr=dx, label=label, color=color, fmt='o', markersize=2, capsize=3)
+      dy = 0.0
+    capsize = 0
+    if caps:
+      capsize = 3
+    plot = plt.errorbar(x=x,y=y,yerr=dy,xerr=dx,label=label,color=color,fmt='o',markersize=3,capsize=capsize)
     if (connect == True):
       if (color == None):
         color = plot[0].get_color()
       plt.plot(x, y, color=color)
-    if (label != ''):
+  
+  @staticmethod
+  def set_layout(legend=False,xlim=None,ylim=None):
+    if (xlim != None):
+      plt.xlim(xlim)
+    if (ylim != None):
+      plt.ylim(ylim)
+    if legend:
       plt.legend()
+    plt.tight_layout()
 
 def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=False):
   if (fit_range == None):
@@ -329,16 +387,17 @@ def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=Fal
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
-    dx = [0.0 for i in range(len(x))]
+    dx = np.zeros(len(x))
     result = iter0
   else:
     g = iter0[0]
     g_old = g * (1 - 2 * linreg_change)
+    _dy = dy
     while (abs(1 - g_old / g) >= linreg_change):
       g_old = g
-      dy = np.sqrt((g * dx)**2 + dy**2)
-      g = linreg_iter(x, y, dy)[0]
-    result = linreg_iter(x, y, dy)
+      _dy = np.sqrt((g * dx)**2 + _dy**2)
+      g = linreg_iter(x, y, _dy)[0]
+    result = linreg_iter(x, y, _dy)
   if (plot):
     [g, dg, b, db] = result
     min_x = np.argmin(x)
@@ -348,15 +407,15 @@ def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=Fal
     yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
     fitfunc = plt.plot(xint, yfit, marker='')
     color = fitfunc[0].get_color()
-    plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
+    plt.plot(xint, yerr, marker='',linestyle='dashed', color=color)
     pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
     if (legend):
       plt.legend(['Fit', 'Fit uncertainty'])
-    elif (graphname != ''):
-      plt.legend()
   return result
 
 def expreg(x,y,dy,dx=[],plot=True):
+  if (dx == []):
+    dx = np.zeros(len(x))
   expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx)
   yitc = exp(_yitc)
   dyitc = yitc * _dyitc
@@ -372,8 +431,3 @@ def expreg(x,y,dy,dx=[],plot=True):
     plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
     pltext.plotdata(x=x, y=y, dy=dy, dx=dx, color=color)
   return result
-
-def lin_yerr(x, dx, y, dy):
-  g = linreg(x, y, dx, dy)
-  new_dy = [np.sqrt(dy[i]**2 + (g * dx[i])**2) for i in range(len(dy))]
-  return new_dy
