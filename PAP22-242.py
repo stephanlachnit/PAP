@@ -70,8 +70,8 @@ f_2_dsys = f_2 * f_uncert
 U_A5 = npfarray([424,744,984,1250,1460,1540,1530,1520,1500,1500,1480,1460])*1e-3
 U_A5_dsys = npfarray([1,1,1,10,10,10,10,10,10,10,10,10])*1e-3
 
-Vss = [0.3,1.0]
-Vss_dsys = [5e-3,20e-3]
+Vss = npfarray([0.3,1.0]) / 10
+Vss_dsys = npfarray([5e-3,20e-3]) / 10
 V_A1 = U_A1 / Vss[0]
 V_A1_dsys = 1/Vss[0] * sqrt(U_A1_dsys**2 + (U_A1 * Vss_dsys[0] / Vss[0])**2)
 V_A2 = U_A2 / Vss[0]
@@ -92,12 +92,12 @@ pltext.plotdata(f_2,U_A5,U_A5_dsys,f_2_dsys,label='48k7 mit 47nF Eingangskapazit
 pltext.set_layout(legend=True,xlim=(260,3.4e5),ylim=(3e-2,8))
 
 pltext.initplot(num=2,title='Abbildung   : Frequenzgang des Verstärkers (Verstärkung)',xlabel='Frequenz in Hz',ylabel='Verstärkung',scale='loglog')
-pltext.plotdata(f_1,V_A1,V_A1_dsys,f_1_dsys,label='680k',caps=False)
-pltext.plotdata(f_1,V_A2,V_A2_dsys,f_1_dsys,label='274k',caps=False)
-pltext.plotdata(f_1,V_A3,V_A3_dsys,f_1_dsys,label='48k7',caps=False)
-pltext.plotdata(f_1,V_A4,V_A4_dsys,f_1_dsys,label='48k7 mit 560pF Parallelkapazität',caps=False)
-pltext.plotdata(f_2,V_A5,V_A5_dsys,f_2_dsys,label='48k7 mit 47nF Eingangskapazität',caps=False)
-pltext.set_layout(legend=True,xlim=(260,3.4e5),ylim=(3e-2,3e2))
+pltext.plotdata(f_1,V_A1,V_A1_dsys,f_1_dsys,label='680k',caps=False,connect=True)
+pltext.plotdata(f_1,V_A2,V_A2_dsys,f_1_dsys,label='274k',caps=False,connect=True)
+pltext.plotdata(f_1,V_A3,V_A3_dsys,f_1_dsys,label='48k7',caps=False,connect=True)
+pltext.plotdata(f_1,V_A4,V_A4_dsys,f_1_dsys,label='48k7 mit 560pF Parallelkapazität',caps=False,connect=True)
+pltext.plotdata(f_2,V_A5,V_A5_dsys,f_2_dsys,label='48k7 mit 47nF Eingangskapazität',caps=False,connect=True)
+pltext.set_layout(legend=True,xlim=(260,3.4e5),ylim=(3e-1,3e2))
 
 print()
 plt.show()
