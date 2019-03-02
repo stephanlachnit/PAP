@@ -68,11 +68,11 @@ c = popt[0]
 c_dsto = sqrt(pcov[0][0])
 
 k = c / (4 * T * B)
-k_dsto = c_dsto / (4 * T * B)
-k_dsys = c / (4 * T * B) * sqrt((T * B_dsys / B)**2 + (B * T_dsys / T)**2)
-k_dsys_woT = c / (4 * T * B) * sqrt((T * B_dsys / B)**2)
+k_dc = c_dsto / (4 * T * B)
+k_dB = c / (4 * T * B**2) * B_dsys
+k_dT = c / (4 * T**2 * B) * T_dsys
 
-k_dtot = sqrt(k_dsto**2 + k_dsys**2)
+k_dtot = sqrt(k_dc**2 + k_dB**2 + k_dT**2)
 
 from scipy.stats import chi2
 
@@ -89,11 +89,10 @@ pltext.set_layout(legend=True,xlim=(0,3.5e4),ylim=(0,3e-5))
 
 print(val(T,T_dsys,'Temp'))
 print(val(c,c_dsto,'Steigung c'))
-print(val(k,name='k'))
-print(val(k_dsto,name='k_dsto'))
-print(val(k_dsys,name='k_dsys'))
-print(val(k_dtot,name='k_dtot'))
-print(val(k_dsys_woT,name='k_dsys_woT'))
+print(val(k,k_dtot,name='k'))
+print(val(k_dc,name='k_dc'))
+print(val(k_dB,name='k_dB'))
+print(val(k_dT,name='k_dT'))
 print(dev(k,k_dtot,kB,name='Abw',perc=True))
 print(val(chisqr,name='chi2'))
 print(val(chisqr_red,name='chi2_red'))
