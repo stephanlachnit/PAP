@@ -1,4 +1,4 @@
-### measure libraby version 1.8.8s
+### measure libraby version 1.8.9s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -6,6 +6,7 @@ from scipy.optimize import curve_fit
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
 minfloat = 1e-80 # replaces zeros in linreg
+linspace_res = 2000 # resolution for linspace
 
 # Variables for export
 sqrt = np.sqrt
@@ -32,6 +33,9 @@ dg = 2e-5 # Uncertainty of the gravitational acceleration
 
 def npfarray(x):
   return np.array(x, dtype='float')
+
+def nplinspace(start,stop):
+  return np.linspace(start,stop,num=linspace_res,endpoint=True)
 
 def mv(val):
   """
@@ -233,10 +237,6 @@ def tbl(lists):
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def sig(name, val1, err1, val2, err2=0.0, perc=False):
-  ### deprecated, use dev instead, will be removed in 1.8.9s
-  return dev(val1,err1,val2,err2,name=name,perc=perc)
-
 def dev(val1,err1,val2,err2=0.0,name='',perc=False):
   def get_sig(nominator,denominator):
     if (nominator == 0.0):
@@ -255,7 +255,7 @@ def dev(val1,err1,val2,err2=0.0,name='',perc=False):
     sigstr += 'σ'
     return sigstr
 
-  def get_perc(val1,val2,pformat='{:.2f}'):
+  def get_perc(val1,val2,pformat='{:.1f}'):
     percval = abs(val1 - val2) / val2 * 100
     percstr = pformat.format(percval) + '%'
     return percstr
@@ -304,19 +304,6 @@ def dev(val1,err1,val2,err2=0.0,name='',perc=False):
       out += ' ; ' + get_perc(val1,val2,pformat='{:.2g}')
   return out
 
-def chi2(yo, dyo, ye, dye=[]):
-  if (dye == []):
-    dye = [0.0 for i in range(len(ye))]
-  chi2 = 0.0
-  for i in range(len(yo)):
-    chi2 += (yo[i] - ye[i])**2 / (dyo[i]**2 + dye[i]**2)
-  return chi2
-
-def chi2_red(yo, dyo, ye, dye=[], dof=0):
-  if (dof == 0):
-    dof = len(ye)
-  return chi2(yo, dyo, ye, dye) / dof
-
 class pltext:
   @staticmethod
   def initplot(num=0,title='',xlabel='',ylabel='',scale='linlin',papertype='A4'):
@@ -340,7 +327,7 @@ class pltext:
       plt.xscale('log')
 
   @staticmethod
-  def plotdata(x,y,dy=[],dx=[],label='',caps=True,connect=False,color=None):
+  def plotdata(x,y,dy=[],dx=[],label='',caps=False,connect=False,color=None):
     if (dx == []):
       dx = 0.0
     if (dy == []):
@@ -364,12 +351,12 @@ class pltext:
       plt.legend()
     plt.tight_layout()
 
-def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=False):
-  if (fit_range == None):
-    fit_range = range(len(x))
+def linreg(x,y,dy,dx=[],plot=False,label='',frange=[]):
+  if (frange == []):
+    frange = range(len(x))
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
-    for i in fit_range:
+    for i in frange:
       if (dy[i] == 0.0):
         dy[i] = minfloat
       s0 += dy[i]**-2
@@ -398,19 +385,17 @@ def linreg(x, y, dy, dx=[], fit_range=None, plot=False, graphname='', legend=Fal
       _dy = np.sqrt((g * dx)**2 + _dy**2)
       g = linreg_iter(x, y, _dy)[0]
     result = linreg_iter(x, y, _dy)
-  if (plot):
+  if plot:
     [g, dg, b, db] = result
     min_x = np.argmin(x)
     max_x = np.argmax(x)
-    xint = [x[min_x] - dx[min_x], x[max_x] + dx[max_x]]
-    yfit = [g * xint[i] + b for i in range(2)]
-    yerr = [(g + dg) * xint[i] + (b - db) for i in range(2)]
-    fitfunc = plt.plot(xint, yfit, marker='')
+    xint = nplinspace(x[min_x] - dx[min_x], x[max_x] + dx[max_x])
+    yfit = g * xint + b
+    yerr = (g + dg) * xint + (b - db)
+    fitfunc = plt.plot(xint, yfit, marker='', label=label+' Fit')
     color = fitfunc[0].get_color()
-    plt.plot(xint, yerr, marker='',linestyle='dashed', color=color)
-    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=graphname, color=color)
-    if (legend):
-      plt.legend(['Fit', 'Fit uncertainty'])
+    plt.plot(xint, yerr, marker='', linestyle='dashed', label=label+' Uncertainty', color=color)
+    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, color=color)
   return result
 
 def expreg(x,y,dy,dx=[],plot=True):
