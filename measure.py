@@ -21,6 +21,9 @@ arccos = np.arccos
 arctan = np.arctan
 pi = np.pi
 euler_e = np.e
+deg_to_rad = pi / 180
+rad_to_deg = 180 / pi
+
 c = 2.99792458e8 # Speed of light
 h = 6.62607015e-34 # Planck's constant
 e = 1.602176634e-19 # Elementary charge
