@@ -1,4 +1,4 @@
-### measure libraby version 1.8.9s
+### measure libraby version 1.8.10s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -351,7 +351,7 @@ class pltext:
       plt.legend()
     plt.tight_layout()
 
-def linreg(x,y,dy,dx=[],plot=False,label='',frange=[]):
+def linreg(x,y,dy,dx=[],plot=False,prange=(0,0),frange=[],label='',samecolor=False):
   if (frange == []):
     frange = range(len(x))
   def linreg_iter(x, y, dy):
@@ -386,16 +386,22 @@ def linreg(x,y,dy,dx=[],plot=False,label='',frange=[]):
       g = linreg_iter(x, y, _dy)[0]
     result = linreg_iter(x, y, _dy)
   if plot:
+    if (prange == (0,0)):
+      min_x = np.argmin(x)
+      max_x = np.argmax(x)
+      xint = nplinspace(x[min_x] - dx[min_x], x[max_x] + dx[max_x])
+    else:
+      xint = nplinspace(*prange)
     [g, dg, b, db] = result
-    min_x = np.argmin(x)
-    max_x = np.argmax(x)
-    xint = nplinspace(x[min_x] - dx[min_x], x[max_x] + dx[max_x])
     yfit = g * xint + b
     yerr = (g + dg) * xint + (b - db)
+    
     fitfunc = plt.plot(xint, yfit, marker='', label=label+' Fit')
     color = fitfunc[0].get_color()
     plt.plot(xint, yerr, marker='', linestyle='dashed', label=label+' Uncertainty', color=color)
-    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, color=color)
+    if not samecolor:
+      color = None
+    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=label+' Measurements', color=color)
   return result
 
 def expreg(x,y,dy,dx=[],plot=True):
