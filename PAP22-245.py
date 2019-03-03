@@ -1,6 +1,7 @@
-# measure version 1.8.10s
-from measure import sqrt,val,npfarray,pltext,plt,linreg,pi,dev,arccos
+# measure version 1.8.11s
+from measure import sqrt,val,npfarray,pltext,plt,linreg,pi,dev,arccos,cos,curve_fit,nplinspace,deg_to_rad,rad_to_deg
 
+# Daten für Spule
 r_h = 0.295 / 2
 s_h = 0.147
 N_h = 124
@@ -59,9 +60,22 @@ Vss_3a_dsys = npfarray([0.03,0.02,0.01,0.02])
 Uind_3a =  Vss_3a / 2
 Uind_3a_dsys = Vss_3a_dsys / 2
 
-pltext.initplot(num=3,title='Abbildung   : Induktionsspannung als Funktion des Winkel',xlabel='Winkel in deg',ylabel='Induktionsspannung in V')
-pltext.plotdata(w_3a,Uind_3a,Uind_3a_dsys,w_3a_dsys,connect=True)
-pltext.set_layout(xlim=(-10,100),ylim=(0,0.8))
+def fitfunc_3a(w,B):
+  return B * A_i * N_i * 2*pi * 100 * cos(w * deg_to_rad)
+
+w_array = nplinspace(-10,100)
+popt_3a,pcov_3a = curve_fit(fitfunc_3a,w_3a,Uind_3a,sigma=Uind_3a_dsys)
+
+B_3a = popt_3a[0]
+B_3a_dsys = sqrt(pcov_3a[0][0])
+
+pltext.initplot(num=3,title='Abbildung   : Induktionsspannung als Funktion des Winkels',xlabel='Winkel in deg',ylabel='Induktionsspannung in V')
+plt.plot(w_array,fitfunc_3a(w_array,*popt_3a),label=' Fit')
+pltext.plotdata(w_3a,Uind_3a,Uind_3a_dsys,w_3a_dsys,label=' Measurements')
+pltext.set_layout(legend=True,xlim=(-10,100),ylim=(0,0.8))
+
+print('\nAufgabe 3a:\n')
+print(val(B_3a,B_3a_dsys,'B'))
 
 # Aufgabe 3b
 f_3b = npfarray([20.3,40.4,60.2,80.1,100.2,120.0,142.3,165.0,180.3,200.5,404.5,595.5,802.5,1006,1206,1404,1603,1784,2025])
@@ -122,7 +136,6 @@ Uind_4b_dsys = 0.5e-3 / 2
 B_4b = Uind_4b / (2*pi * N_i * A_i * f_4b)
 B_4b_dsys = 1 / (2*pi * N_i * A_i * f_4b) * sqrt(Uind_4b_dsys**2 + (Uind_4b * f_4b_dsys / f_4b)**2)
 
-rad_to_deg = 360 / (2*pi)
 w_4b = arccos(B_4b / B_4a) * rad_to_deg
 w_4b_dsys = 1 / (B_4a * sqrt(1 - (B_4b / B_4a)**2)) * sqrt(B_4b_dsys**2 + (B_4b * B_4a_dsys / B_4a)**2) * rad_to_deg
 w_4b_theo = 66
