@@ -1,4 +1,4 @@
-# measure version 1.8.11s
+# measure version 1.8.12s
 from measure import plt,pltext,npfarray,linreg,sqrt,val,dev,exp,pi,spcurvefit,nplinspace,tbl
 from numpy import loadtxt
 from scipy.special import gamma
