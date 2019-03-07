@@ -1,4 +1,4 @@
-### measure libraby version 1.8.10s
+### measure libraby version 1.8.11s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -37,8 +37,13 @@ dg = 2e-5 # Uncertainty of the gravitational acceleration
 def npfarray(x):
   return np.array(x, dtype='float')
 
-def nplinspace(start,stop):
+def nplinspace(start, stop):
   return np.linspace(start,stop,num=linspace_res,endpoint=True)
+
+def spcurvefit(fitfunc, xdata, ydata, yerr=None, p0=None):
+  p_opt,p_cov = curve_fit(fitfunc, xdata, ydata, p0=p0, sigma=yerr)
+  p_err = sqrt(np.diag(p_cov))
+  return (p_opt, p_err)
 
 def mv(val):
   """
@@ -53,32 +58,34 @@ def mv(val):
   s = np.sum(val)
   return s / len(val)
 
-def dsto(val):
+def dsto(val, ddof=1):
   """
   Parameters
 
   val: npfarray;
+  ddof: float;
   ----------
   Returns
 
-  float; standard devation (dof = N-1);
+  float; standard devation with dof = len(val) - ddof;
   """
   
   _mv = mv(val)
   s = np.sum((val - _mv)**2)
-  return sqrt(s / (len(val) - 1))
+  return sqrt(s / (len(val) - ddof))
 
-def dsto_mv(val):
+def dsto_mv(val, ddof=1):
   """
   Parameters
 
   val: npfarray;
+  ddof: float;
   ----------
   Returns
 
-  float; standard devation of the mean value (dof = N-1);
+  float; standard devation of the mean value with dof = len(val) - ddof;
   """
-  return dsto(val) / sqrt(len(val))
+  return dsto(val,ddof=ddof) / sqrt(len(val))
 
 def dsys_mv(err):
   """
@@ -149,13 +156,14 @@ def signval(val, err=0.0):
   valstr = '{:.{digits}e}'.format(val, digits=sdigits)
   return [valstr, errstr]
 
-def val(val, err=0.0, name=''):
+def val(val, err=0.0, name='', percerr=False):
   """
   Parameters
 
   val: float;
   err: float; uncertainty of val;
   name: string; name of val;
+  percerr: bool; print error in percent
   ----------
   Returns
 
@@ -168,6 +176,8 @@ def val(val, err=0.0, name=''):
   out += tmp[0]
   if (tmp[1] != ''):
     out += ' ± ' + tmp[1]
+    if percerr:
+      out += ' ({:.2g}%)'.format(100 * err / val)
   return out
 
 def lst(val, err=[], name=''):
@@ -240,7 +250,7 @@ def tbl(lists):
       out += lists[i][j].ljust(lens[i]) + suffix
   return out
 
-def dev(val1,err1,val2,err2=0.0,name='',perc=False):
+def dev(val1, err1, val2, err2=0.0, name='', perc=False):
   def get_sig(nominator,denominator):
     if (nominator == 0.0):
       sigstr = '0'
@@ -309,14 +319,13 @@ def dev(val1,err1,val2,err2=0.0,name='',perc=False):
 
 class pltext:
   @staticmethod
-  def initplot(num=0,title='',xlabel='',ylabel='',scale='linlin',papertype='A4'):
+  def initplot(num=0, title='', xlabel='', ylabel='', scale='linlin'):
     fig = plt.figure(num)
     plt.title(title, fontsize='14')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True, which='both')
-    if (papertype == 'A4'):
-      fig.set_size_inches(11.69,8.27)
+    fig.set_size_inches(11.69,8.27)
     if (scale == 'linlin'):
       plt.ticklabel_format(style='sci', axis='both', scilimits=(-2,3))
     elif (scale == 'linlog'):
@@ -330,7 +339,7 @@ class pltext:
       plt.xscale('log')
 
   @staticmethod
-  def plotdata(x,y,dy=[],dx=[],label='',caps=False,connect=False,color=None):
+  def plotdata(x, y, dy=[], dx=[], label='', caps=False, connect=False, color=None):
     if (dx == []):
       dx = 0.0
     if (dy == []):
@@ -339,13 +348,14 @@ class pltext:
     if caps:
       capsize = 3
     plot = plt.errorbar(x=x,y=y,yerr=dy,xerr=dx,label=label,color=color,fmt='o',markersize=3,capsize=capsize)
+    if (color == None):
+      color = plot[0].get_color()
     if (connect == True):
-      if (color == None):
-        color = plot[0].get_color()
       plt.plot(x, y, color=color)
+    return color
   
   @staticmethod
-  def set_layout(legend=False,xlim=None,ylim=None):
+  def set_layout(xlim=None, ylim=None, legend=True):
     if (xlim != None):
       plt.xlim(xlim)
     if (ylim != None):
@@ -354,12 +364,10 @@ class pltext:
       plt.legend()
     plt.tight_layout()
 
-def linreg(x,y,dy,dx=[],plot=False,prange=(0,0),frange=[],label='',samecolor=False):
-  if (frange == []):
-    frange = range(len(x))
+def linreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
-    for i in frange:
+    for i in range(len(x)):
       if (dy[i] == 0.0):
         dy[i] = minfloat
       s0 += dy[i]**-2
@@ -373,7 +381,6 @@ def linreg(x,y,dy,dx=[],plot=False,prange=(0,0),frange=[],label='',samecolor=Fal
     b = (s3 * s2 - s1 * s4) / eta
     db = np.sqrt(s3 / eta)
     return [g, dg, b, db]
-
   iter0 = linreg_iter(x, y, dy)
   result = []
   if (dx == []):
@@ -395,33 +402,39 @@ def linreg(x,y,dy,dx=[],plot=False,prange=(0,0),frange=[],label='',samecolor=Fal
       xint = nplinspace(x[min_x] - dx[min_x], x[max_x] + dx[max_x])
     else:
       xint = nplinspace(*prange)
+    prefix = ''
+    color = None
+    if (label != ''):
+      prefix = label + ': '
+      color = pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=prefix+'Measurements')
     [g, dg, b, db] = result
     yfit = g * xint + b
     yerr = (g + dg) * xint + (b - db)
-    
-    fitfunc = plt.plot(xint, yfit, marker='', label=label+' Fit')
-    color = fitfunc[0].get_color()
-    plt.plot(xint, yerr, marker='', linestyle='dashed', label=label+' Uncertainty', color=color)
-    if not samecolor:
-      color = None
-    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=label+' Measurements', color=color)
+    color = plt.plot(xint, yfit, marker='', label=prefix+'Fit', color=color)[0].get_color()
+    plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
   return result
 
-def expreg(x,y,dy,dx=[],plot=True):
-  if (dx == []):
-    dx = np.zeros(len(x))
-  expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx)
+def expreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
+  expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx,plot=False)
   yitc = exp(_yitc)
   dyitc = yitc * _dyitc
   result = [expo,dexpo,yitc,dyitc]
   if (plot):
-    min_x = np.argmin(x)
-    max_x = np.argmax(x)
-    xint = np.linspace(x[min_x]-dx[min_x],x[max_x]+dx[max_x],1000)
+    if (dx == []):
+      dx = np.zeros(len(x))
+    if (prange == (0,0)):
+      min_x = np.argmin(x)
+      max_x = np.argmax(x)
+      xint = nplinspace(x[min_x]-dx[min_x],x[max_x]+dx[max_x])
+    else:
+      xint = nplinspace(*prange)
+    prefix = ''
+    color = None
+    if (label != ''):
+      prefix = label + ': '
+      color = pltext.plotdata(x=x,y=y,dy=dy,dx=dx,label=prefix+'Measurements')
     yfit = yitc * exp(expo*xint)
     yerr = (yitc-dyitc) * exp((expo+dexpo)*xint)
-    fitfunc = plt.plot(xint, yfit, marker='')
-    color = fitfunc[0].get_color()
-    plt.plot(xint, yerr, marker='', linestyle='dashed', color=color)
-    pltext.plotdata(x=x, y=y, dy=dy, dx=dx, color=color)
+    color = plt.plot(xint, yfit, marker='', label=prefix+'Fit', color=color)[0].get_color()
+    plt.plot(xint, yerr, marker='', label=prefix+'Uncertainty', linestyle='dashed', color=color)    
   return result
