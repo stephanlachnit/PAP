@@ -1,4 +1,4 @@
-### measure libraby version 1.8.11s
+### measure libraby version 1.8.12s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -339,11 +339,7 @@ class pltext:
       plt.xscale('log')
 
   @staticmethod
-  def plotdata(x, y, dy=[], dx=[], label='', caps=False, connect=False, color=None):
-    if (dx == []):
-      dx = 0.0
-    if (dy == []):
-      dy = 0.0
+  def plotdata(x, y, dy=None, dx=None, label='', caps=True, connect=False, color=None):
     capsize = 0
     if caps:
       capsize = 3
@@ -364,7 +360,7 @@ class pltext:
       plt.legend()
     plt.tight_layout()
 
-def linreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
+def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -383,8 +379,9 @@ def linreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
     return [g, dg, b, db]
   iter0 = linreg_iter(x, y, dy)
   result = []
-  if (dx == []):
-    dx = np.zeros(len(x))
+  _dx = dx
+  if (dx == None):
+    _dx = np.zeros(len(x))
     result = iter0
   else:
     g = iter0[0]
@@ -397,9 +394,11 @@ def linreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
     result = linreg_iter(x, y, _dy)
   if plot:
     if (prange == (0,0)):
-      min_x = np.argmin(x)
-      max_x = np.argmax(x)
-      xint = nplinspace(x[min_x] - dx[min_x], x[max_x] + dx[max_x])
+      xmin_index = np.argmin(x - _dx)
+      xmax_index = np.argmax(x + _dx)
+      xmin = x[xmin_index] - _dx[xmin_index]
+      xmax = x[xmax_index] + _dx[xmax_index]
+      xint = nplinspace(xmin, xmax)
     else:
       xint = nplinspace(*prange)
     prefix = ''
@@ -414,27 +413,30 @@ def linreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
     plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
   return result
 
-def expreg(x, y, dy, dx=[], plot=False, prange=(0,0), label=''):
+def expreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
   expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx,plot=False)
   yitc = exp(_yitc)
   dyitc = yitc * _dyitc
   result = [expo,dexpo,yitc,dyitc]
   if (plot):
-    if (dx == []):
-      dx = np.zeros(len(x))
+    _dx = dx
+    if (dx == None):
+      _dx = np.zeros(len(x))
     if (prange == (0,0)):
-      min_x = np.argmin(x)
-      max_x = np.argmax(x)
-      xint = nplinspace(x[min_x]-dx[min_x],x[max_x]+dx[max_x])
+      xmin_index = np.argmin(x - _dx)
+      xmax_index = np.argmax(x + _dx)
+      xmin = x[xmin_index] - _dx[xmin_index]
+      xmax = x[xmax_index] + _dx[xmax_index]
+      xint = nplinspace(xmin, xmax)
     else:
       xint = nplinspace(*prange)
     prefix = ''
     color = None
     if (label != ''):
       prefix = label + ': '
-      color = pltext.plotdata(x=x,y=y,dy=dy,dx=dx,label=prefix+'Measurements')
+      color = pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=prefix+'Measurements')
     yfit = yitc * exp(expo*xint)
-    yerr = (yitc-dyitc) * exp((expo+dexpo)*xint)
+    yerr = (yitc-dyitc) * exp((expo+dexpo) * xint)
     color = plt.plot(xint, yfit, marker='', label=prefix+'Fit', color=color)[0].get_color()
     plt.plot(xint, yerr, marker='', label=prefix+'Uncertainty', linestyle='dashed', color=color)    
   return result
