@@ -81,6 +81,9 @@ def poisson(x,A,mu):
 p_opt_g,p_err_g = spcurvefit(gauss,anzahl[5:-12],ereig[5:-12],yerr=fehler[5:-12],p0=[2300,70,8])
 p_opt_p,p_err_p = spcurvefit(poisson,anzahl[5:-12],ereig[5:-12],yerr=fehler[5:-12],p0=[2300,70])
 
+sigma_theo = sqrt(p_opt_g[1])
+sigma_theo_err = 1 / (2 * sqrt(p_opt_g[1])) * p_err_g[1]
+
 from numpy import sum
 from scipy.stats import chi2
 chi2_g = sum((gauss(anzahl[5:-12],*p_opt_g) - ereig[5:-12])**2 / fehler[5:-12]**2)
@@ -102,6 +105,9 @@ pltext.set_layout(xlim=(40,100),ylim=(-2,142))
 print('\nAufgabe 4:\n')
 print(tbl([['Fitmethode','A','mu','sig'],['Gauss',val(p_opt_g[0],p_err_g[0]),val(p_opt_g[1],p_err_g[1]),val(p_opt_g[2],p_err_g[2])],['Poisson',val(p_opt_p[0],p_err_p[0]),val(p_opt_p[1],p_err_p[1]),'']]))
 print()
+print(val(sigma_theo,sigma_theo_err,name='sig (theo)'))
+print(dev(p_opt_g[2],p_err_g[2],sigma_theo,sigma_theo_err,name='Abweichung'))
+print()
 print(tbl([['Fitmethode','Chi2','Chi2red','Fitwkeit'],['Gauss',val(chi2_g),val(chi2_red_g),val(prob_g)],['Poisson',val(chi2_p),val(chi2_red_p),val(prob_p)]]))
 
 # Aufgabe 5
@@ -110,6 +116,9 @@ fehler = sqrt(ereig)
 
 p_opt_g,p_err_g = spcurvefit(gauss,anzahl[0:-2],ereig[0:-2],yerr=fehler[0:-2],p0=[5200,4,2])
 p_opt_p,p_err_p = spcurvefit(poisson,anzahl[0:-2],ereig[0:-2],yerr=fehler[0:-2],p0=[5200,4])
+
+sigma_theo = sqrt(p_opt_g[1])
+sigma_theo_err = 1 / (2 * sqrt(p_opt_g[1])) * p_err_g[1]
 
 chi2_g = sum((gauss(anzahl[0:-2],*p_opt_g) - ereig[0:-2])**2 / fehler[0:-2]**2)
 dof_g = len(anzahl[0:-2]) - 3
@@ -129,6 +138,9 @@ pltext.set_layout(xlim=(0,14),ylim=(4e-1,2e3))
 
 print('\nAufgabe 5:\n')
 print(tbl([['Fitmethode','A','mu','sig'],['Gauss',val(p_opt_g[0],p_err_g[0]),val(p_opt_g[1],p_err_g[1]),val(p_opt_g[2],p_err_g[2])],['Poisson',val(p_opt_p[0],p_err_p[0]),val(p_opt_p[1],p_err_p[1]),'']]))
+print()
+print(val(sigma_theo,sigma_theo_err,name='sig (theo)'))
+print(dev(p_opt_g[2],p_err_g[2],sigma_theo,sigma_theo_err,name='Abweichung'))
 print()
 print(tbl([['Fitmethode','Chi2','Chi2red','Fitwkeit'],['Gauss',val(chi2_g),val(chi2_red_g),val(prob_g)],['Poisson',val(chi2_p),val(chi2_red_p),val(prob_p)]]))
 
