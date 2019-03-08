@@ -1,7 +1,8 @@
-### measure libraby version 1.8.12s
+### measure libraby version 1.9s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from scipy.stats import chi2 as _chi2
 
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
@@ -267,16 +268,35 @@ def dev(val1, err1, val2, err2=0.0, name='', perc=False):
       sigstr = '{:.{digits}f}'.format(sigma,digits=digits)
     sigstr += 'σ'
     return sigstr
-
   def get_perc(val1,val2,pformat='{:.1f}'):
     percval = abs(val1 - val2) / val2 * 100
     percstr = pformat.format(percval) + '%'
     return percstr
-
   out = None
+  array = False
+  if type(val1) is list:
+    val1 = npfarray(val1)
+    array = True
+  elif type(val1) is np.ndarray:
+    array = True
+  if type(val2) is list:
+    val2 = npfarray(val2)
+    array = True
+  elif type(val2) is np.ndarray:
+    array = True
+  if type(err1) is list:
+    err1 = npfarray(err1)
+    array = True
+  elif type(err1) is np.ndarray:
+    array = True
+  if type(err2) is list:
+    err2 = npfarray(err2)
+    array = True
+  elif type(err2) is np.ndarray:
+    array = True
   nominator = abs(val1 - val2)
   denominator = np.sqrt(err1**2 + err2**2)
-  if type(val1) is np.ndarray:
+  if array:
     out = []
     N = len(val1)
     if type(denominator) is not np.ndarray:
@@ -359,6 +379,19 @@ class pltext:
     if legend:
       plt.legend()
     plt.tight_layout()
+
+class chi2stat:
+  @staticmethod
+  def chi2(val1, err1, val2, err2=0.0):
+    return np.sum((val1 - val2)**2 / (err1**2 + err2**2))
+
+  @staticmethod
+  def chi2_red(chi2, len, ddof=0):
+    return chi2 / (len - ddof)
+
+  @staticmethod
+  def fit_prob(chi2, len, ddof=0):
+    return 1 - _chi2.cdf(chi2, len - ddof)
 
 def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
   def linreg_iter(x, y, dy):
