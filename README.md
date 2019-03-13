@@ -1,5 +1,5 @@
 # Scripts for PAP at University Heidelberg
 
-Some older ones, especially from PAP1, might not work.
-You can take a look at 'measure.py' to get the replacement functions.
-Scripts with a given measure can use that version, check git history to get the old version of 'measure.py', each version of 'measure.py' is tagged.
+In the scripts for PAP2 the used version of 'measure.py' is given, every version of measure is tagged within git.
+There are accesable through the repository link plus /tree/vXYZ or the github branches menu.
+PAP1 script use versions of measure before v1.0, which aren't tagged.
