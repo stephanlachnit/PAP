@@ -72,7 +72,7 @@ roh = 11.34e3
 roh_err = 0.01e3
 msk = mu / roh
 msk_err = 1 / roh * sqrt(mu_err**2 + (mu / roh * roh_err)**2)
-E = 1.3e6
+E = 1.4e6
 
 print('\nAufgabe 4:\n')
 print(val(mu,mu_err,name='mu'))
@@ -137,8 +137,8 @@ s0_err = 0.05e-2
 roh_glf = 2.35
 roh_brems = 1.43
 
-s1 = mv(p / p0 * s0)
-s1_err = dtot_mv(p / p0 * s0,1/p0 * sqrt((p_err * s0)**2 + (p * s0_err)**2))
+s1 = p_halb / p0 * s0
+s1_err = 1/p0 * sqrt((p_halb_err * s0)**2 + (p_halb * s0_err)**2)
 
 s2 = s1 + roh_glf / roh_brems * 1e-2
 s2_err = s1_err
@@ -146,7 +146,7 @@ s2_err = s1_err
 s3 = s2 + 0.68e-2
 s3_err = s2_err
 
-E = 5.3e6
+E = 5.4e6
 
 print('\nAufgabe 6:\n')
 print(val(p_halb,p_halb_err,name='p_halb'))
