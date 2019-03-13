@@ -1,4 +1,4 @@
-### measure libraby version 1.9s
+### measure libraby version 1.9.1s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -393,7 +393,7 @@ class chi2stat:
   def fit_prob(chi2, len, ddof=0):
     return 1 - _chi2.cdf(chi2, len - ddof)
 
-def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
+def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='slope_dec', label=''):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -441,12 +441,16 @@ def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
       color = pltext.plotdata(x=x, y=y, dy=dy, dx=dx, label=prefix+'Measurements')
     [g, dg, b, db] = result
     yfit = g * xint + b
-    yerr = (g + dg) * xint + (b - db)
     color = plt.plot(xint, yfit, marker='', label=prefix+'Fit', color=color)[0].get_color()
-    plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
+    if (uncertdraw == 'slope_inc'):
+      yerr = (g + dg) * xint + (b - db)
+      plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
+    elif (uncertdraw == 'slope_dec'):
+      yerr = (g - dg) * xint + (b + db)
+      plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
   return result
 
-def expreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
+def expreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='expon_inc', label=''):
   expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx,plot=False)
   yitc = exp(_yitc)
   dyitc = yitc * _dyitc
@@ -471,5 +475,10 @@ def expreg(x, y, dy, dx=None, plot=False, prange=(0,0), label=''):
     yfit = yitc * exp(expo*xint)
     yerr = (yitc-dyitc) * exp((expo+dexpo) * xint)
     color = plt.plot(xint, yfit, marker='', label=prefix+'Fit', color=color)[0].get_color()
-    plt.plot(xint, yerr, marker='', label=prefix+'Uncertainty', linestyle='dashed', color=color)    
+    if (uncertdraw == 'expon_inc'):
+      yerr = (yitc-dyitc) * exp((expo+dexpo) * xint)
+      plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
+    elif (uncertdraw == 'expon_dec'):
+      yerr = (yitc+dyitc) * exp((expo-dexpo) * xint)
+      plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)    
   return result
