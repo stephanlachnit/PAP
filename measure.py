@@ -1,8 +1,9 @@
-### measure libraby version 1.9.1s
+### measure libraby version 1.9.2s
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.stats import chi2 as _chi2
+from numpy import loadtxt
 
 # Settings
 linreg_change = 0.00001 # min relative change per step to end linear regression
@@ -50,12 +51,14 @@ def mv(val):
   """
   Parameters
 
-  val: npfarray;
+  val: npfarray (or list);
   ----------
   Returns
 
   float; mean value of val;
   """
+  if (type(val) == list):
+    val = npfarray(val)
   s = np.sum(val)
   return s / len(val)
 
@@ -63,14 +66,15 @@ def dsto(val, ddof=1):
   """
   Parameters
 
-  val: npfarray;
+  val: npfarray (or list);
   ddof: float;
   ----------
   Returns
 
   float; standard devation with dof = len(val) - ddof;
   """
-  
+  if (type(val) == list):
+    val = npfarray(val)
   _mv = mv(val)
   s = np.sum((val - _mv)**2)
   return sqrt(s / (len(val) - ddof))
@@ -79,7 +83,7 @@ def dsto_mv(val, ddof=1):
   """
   Parameters
 
-  val: npfarray;
+  val: npfarray (or list);
   ddof: float;
   ----------
   Returns
@@ -92,12 +96,14 @@ def dsys_mv(err):
   """
   Parameters
 
-  err: npfarray; systematic errors;
+  err: npfarray (or list); systematic errors;
   ----------
   Returns
 
   float; systematic error of the mean value;
   """
+  if (type(err) == list):
+    err = npfarray(err)
   return sqrt(np.sum(err**2)) / len(err)
 
 def dtot(dsys, dsto):
@@ -117,8 +123,8 @@ def dtot_mv(val, err):
   """
   Parameters
 
-  val: npfarray;
-  err: npfarray; systematic errors;
+  val: npfarray (or list);
+  err: npfarray (or list); systematic errors;
   ----------
   Returns
 
@@ -393,7 +399,7 @@ class chi2stat:
   def fit_prob(chi2, len, ddof=0):
     return 1 - _chi2.cdf(chi2, len - ddof)
 
-def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='slope_dec', label=''):
+def linreg(x, y, dy, dx=None, plot=False, prange=None, uncertdraw='slope_dec', label=''):
   def linreg_iter(x, y, dy):
     [s0, s1, s2, s3, s4] = [0.0, 0.0, 0.0, 0.0, 0.0]
     for i in range(len(x)):
@@ -426,7 +432,7 @@ def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='slope_dec', 
       g = linreg_iter(x, y, _dy)[0]
     result = linreg_iter(x, y, _dy)
   if plot:
-    if (prange == (0,0)):
+    if (prange == None):
       xmin_index = np.argmin(x - _dx)
       xmax_index = np.argmax(x + _dx)
       xmin = x[xmin_index] - _dx[xmin_index]
@@ -450,7 +456,7 @@ def linreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='slope_dec', 
       plt.plot(xint, yerr, marker='', linestyle='dashed', label=prefix+'Uncertainty', color=color)
   return result
 
-def expreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='expon_inc', label=''):
+def expreg(x, y, dy, dx=None, plot=False, prange=None, uncertdraw='expon_inc', label=''):
   expo,dexpo,_yitc,_dyitc = linreg(x,np.log(y),dy/y,dx,plot=False)
   yitc = exp(_yitc)
   dyitc = yitc * _dyitc
@@ -459,7 +465,7 @@ def expreg(x, y, dy, dx=None, plot=False, prange=(0,0), uncertdraw='expon_inc', 
     _dx = dx
     if (dx == None):
       _dx = np.zeros(len(x))
-    if (prange == (0,0)):
+    if (prange == None):
       xmin_index = np.argmin(x - _dx)
       xmax_index = np.argmax(x + _dx)
       xmin = x[xmin_index] - _dx[xmin_index]
