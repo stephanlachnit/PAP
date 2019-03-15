@@ -21,7 +21,15 @@ unterg_ag_mv_dsto = dsto_mv(4*unterg,ddof=0)
 def fitfunc(x,A1,l1,A2,l2):
   return A1 * exp(-l1 * x) + A2 * exp(-l2 * x) + unterg_ag_mv
 
+def fitfunc_pf(x,A1,l1,A2,l2):
+  return A1 * exp(-l1 * x) + A2 * exp(-l2 * x) + unterg_ag_mv + unterg_ag_mv_dsto
+
+def fitfunc_mf(x,A1,l1,A2,l2):
+  return A1 * exp(-l1 * x) + A2 * exp(-l2 * x) + unterg_ag_mv - unterg_ag_mv_dsto
+
 p_opt,p_err = spcurvefit(fitfunc,t,N_ag,p0=[500,0.02,50,0.001],yerr=N_ag_err)
+p_opt_pf,p_err_pf = spcurvefit(fitfunc_pf,t,N_ag,p0=[500,0.02,50,0.001],yerr=N_ag_err)
+p_opt_mf,p_err_mf = spcurvefit(fitfunc_mf,t,N_ag,p0=[500,0.02,50,0.001],yerr=N_ag_err)
 
 Thalb_Ag110 = ln(2) / p_opt[1]
 Thalb_Ag110_dsys = ln(2) * p_err[1] / p_opt[1]**2
@@ -35,18 +43,28 @@ chi2_ = chi2stat.chi2(N_ag,N_ag_err,fitfunc(t,*p_opt))
 chi2_red = chi2stat.chi2_red(chi2_,len(N_ag),ddof=4)
 prob = chi2stat.fit_prob(chi2_,len(N_ag),ddof=4)
 
+chi2_pf = chi2stat.chi2(N_ag,N_ag_err,fitfunc_pf(t,*p_opt_pf))
+chi2_red_pf = chi2stat.chi2_red(chi2_pf,len(N_ag),ddof=4)
+prob_pf = chi2stat.fit_prob(chi2_pf,len(N_ag),ddof=4)
+
+chi2_mf = chi2stat.chi2(N_ag,N_ag_err,fitfunc_mf(t,*p_opt_mf))
+chi2_red_mf = chi2stat.chi2_red(chi2_mf,len(N_ag),ddof=4)
+prob_mf = chi2stat.fit_prob(chi2_mf,len(N_ag),ddof=4)
+
 t_array = nplinspace(0,400)
 pltext.initplot(num=1,title='Abbildung   : Zerfall von Silber',xlabel='Zeit in s',ylabel='# Zerfälle (mit Untergrund)',scale='linlog')
 pltext.plotdata(t,N_ag,N_ag_err,label='Messwerte')
 plt.plot(t_array,fitfunc(t_array,*p_opt),label='Fit')
+plt.plot(t_array,fitfunc_pf(t_array,*p_opt_pf),label='Fit + Fehler Ug')
+plt.plot(t_array,fitfunc_mf(t_array,*p_opt_mf),label='Fit - Fehler Ug')
 pltext.set_layout(xlim=(0,4e2),ylim=(2e1,4e2))
 
 print('\nSilber:\n')
 print(val(unterg_ag_mv,unterg_ag_mv_dsto,name='Untergrund'))
 print()
-print(tbl([['','A1','l1','A2','l2'],['Anfangswerte','500','0.02','50','0.001'],['Fitwerte',val(p_opt[0],p_err[0]),val(p_opt[1],p_err[1]),val(p_opt[2],p_err[2]),val(p_opt[3],p_err[3])]]))
+print(tbl([['','A1','l1','A2','l2'],['Fitwerte',val(p_opt[0],p_err[0]),val(p_opt[1],p_err[1]),val(p_opt[2],p_err[2]),val(p_opt[3],p_err[3])],['Fitwerte pf',val(p_opt_pf[0],p_err_pf[0]),val(p_opt_pf[1],p_err_pf[1]),val(p_opt_pf[2],p_err_pf[2]),val(p_opt_pf[3],p_err_pf[3])],['Fitwerte mf',val(p_opt_mf[0],p_err_mf[0]),val(p_opt_mf[1],p_err_mf[1]),val(p_opt_mf[2],p_err_mf[2]),val(p_opt_mf[3],p_err_mf[3])]]))
 print()
-print(tbl([['chi2','chi2_red','fitwkeit'],[val(chi2_),val(chi2_red),val(prob)]]))
+print(tbl([['','chi2','chi2_red','fitwkeit'],['',val(chi2_),val(chi2_red),val(prob)],['pf',val(chi2_pf),val(chi2_red_pf),val(prob_pf)],['mf',val(chi2_mf),val(chi2_red_mf),val(prob_mf)]]))
 print()
 print(tbl([['Isotop','Ag 108','Ag 110'],['Thalb (fit)',val(Thalb_Ag108,Thalb_Ag108_dsys),val(Thalb_Ag110,Thalb_Ag110_dsys)],['Thalb (theo)',val(Thalb_Ag108_lit),val(Thalb_Ag110_lit)],dev([Thalb_Ag108,Thalb_Ag110],[Thalb_Ag108_dsys,Thalb_Ag110_dsys],[Thalb_Ag108_lit,Thalb_Ag110_lit],name='Abw',perc=True)]))
 
